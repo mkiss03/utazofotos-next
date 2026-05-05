@@ -168,6 +168,33 @@ export const bookings = pgTable(
 );
 
 /* ============================================================
+   KAPCSOLATI ÜZENETEK (kapcsolat oldal form)
+   ============================================================ */
+export const contactMessageStatusEnum = pgEnum('contact_message_status', [
+  'new',
+  'replied',
+  'archived',
+]);
+
+export const contactMessages = pgTable(
+  'contact_messages',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: varchar('name', { length: 200 }).notNull(),
+    email: varchar('email', { length: 255 }).notNull(),
+    message: text('message').notNull(),
+    status: contactMessageStatusEnum('status').notNull().default('new'),
+    adminNote: text('admin_note').notNull().default(''),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    statusIdx: index('contact_messages_status_idx').on(t.status),
+    createdIdx: index('contact_messages_created_idx').on(t.createdAt),
+  }),
+);
+
+/* ============================================================
    OLDALI TARTALMAK / BEÁLLÍTÁSOK
    ============================================================
    Egyszerű kulcs-érték store a hero / rólam / menetrend / kapcsolati infóhoz.
@@ -214,4 +241,6 @@ export type NewDeparture = typeof departures.$inferInsert;
 export type Media = typeof media.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 export type NewBooking = typeof bookings.$inferInsert;
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type NewContactMessage = typeof contactMessages.$inferInsert;
 export type SiteContent = typeof siteContent.$inferSelect;

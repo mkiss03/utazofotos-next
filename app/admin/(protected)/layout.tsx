@@ -6,6 +6,7 @@ import {
   MapPinned,
   CalendarDays,
   Mailbox,
+  MessageSquare,
   Image as ImageIcon,
   FileText,
   Settings,
@@ -52,6 +53,9 @@ export default async function AdminLayout({
           </AdminLink>
           <AdminLink href="/admin/foglalasok" icon={<Mailbox size={20} />}>
             Foglalások
+          </AdminLink>
+          <AdminLink href="/admin/uzenetek" icon={<MessageSquare size={20} />}>
+            Üzenetek
           </AdminLink>
           <AdminLink href="/admin/media" icon={<ImageIcon size={20} />}>
             Médiatár

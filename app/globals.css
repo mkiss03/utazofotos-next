@@ -1927,3 +1927,10 @@ textarea.form-ctrl { resize: vertical; min-height: 120px; line-height: 1.55; }
 .dep-card.is-past .dep-date-badge { background: var(--muted); }
 .dep-status.past { background: #ececec; color: #666; }
 
+
+/* Üzenetek (kapcsolat form) extra status pill stílusok */
+.admin-pill-replied { background: #eaf6ee; color: var(--success); }
+.admin-pill-archived { background: var(--light); color: var(--muted); }
+.admin-booking-replied { border-left: 4px solid var(--success); }
+.admin-booking-archived { border-left: 4px solid var(--border); opacity: .85; }
+
