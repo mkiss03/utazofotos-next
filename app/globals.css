@@ -1922,3 +1922,8 @@ textarea.form-ctrl { resize: vertical; min-height: 120px; line-height: 1.55; }
   .inline-edit-header { padding: 14px 16px; }
   .inline-edit-header h2 { font-size: 1.05rem; }
 }
+/* Lejárt indulások a publikus listán */
+.dep-card.is-past { opacity: .55; background: var(--light); border-style: dashed; }
+.dep-card.is-past .dep-date-badge { background: var(--muted); }
+.dep-status.past { background: #ececec; color: #666; }
+

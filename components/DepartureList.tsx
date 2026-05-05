@@ -1,12 +1,20 @@
 import Link from 'next/link';
-import { CalendarDays, Clock, CheckCircle2, AlertCircle, XCircle, Info } from 'lucide-react';
+import { CalendarDays, Clock, CheckCircle2, AlertCircle, XCircle, Info, History } from 'lucide-react';
 import {
   type Destination,
   type Departure,
   statusLabel,
 } from '@/lib/destinations';
 
-function StatusBadge({ status }: { status: Departure['status'] }) {
+function StatusBadge({ status, isPast }: { status: Departure['status']; isPast?: boolean }) {
+  if (isPast) {
+    return (
+      <span className="dep-status past">
+        <History size={14} aria-hidden="true" />
+        Lejárt időpont
+      </span>
+    );
+  }
   const Icon =
     status === 'available' ? CheckCircle2 : status === 'few' ? AlertCircle : XCircle;
   return (
@@ -29,11 +37,14 @@ export function DepartureList({ destination }: { destination: Destination }) {
     );
   }
 
-  // Csak jövőbeli indulásokat mutatunk; ha nincs, akkor mind.
+  // Jövőbelieket előre, lejárt időpontokat utánuk – disabled állapotban.
   const today = new Date(new Date().setHours(0, 0, 0, 0));
-  const upcoming = destination.departures.filter((d) => new Date(d.dateISO) >= today);
-  const list = upcoming.length > 0 ? upcoming : destination.departures;
-  const sorted = [...list].sort((a, b) => a.dateISO.localeCompare(b.dateISO));
+  const all = [...destination.departures].sort((a, b) =>
+    a.dateISO.localeCompare(b.dateISO),
+  );
+  const upcoming = all.filter((d) => new Date(d.dateISO) >= today);
+  const past = all.filter((d) => new Date(d.dateISO) < today).reverse();
+  const sorted = [...upcoming, ...past];
 
   return (
     <section className="dep-section" aria-labelledby="dep-title">
@@ -41,13 +52,17 @@ export function DepartureList({ destination }: { destination: Destination }) {
         Válassz indulási időpontot
       </h2>
       <p className="dep-section-sub">
-        {sorted.length === 1
-          ? 'Egy időpont érhető el. Kattints a foglaláshoz, vagy hívj telefonon.'
-          : `${sorted.length} időpont érhető el – válaszd ki, melyikre szeretnél jönni.`}
+        {upcoming.length === 0
+          ? 'Jelenleg nincs meghirdetett új időpont. Az alábbi időpontok már lejártak.'
+          : upcoming.length === 1
+            ? 'Egy időpont érhető el. Kattints a foglaláshoz, vagy hívj telefonon.'
+            : `${upcoming.length} időpont érhető el – válaszd ki, melyikre szeretnél jönni.`}
       </p>
       <ul className="dep-list" style={{ listStyle: 'none' }}>
-        {sorted.map((dep) => (
-          <li key={dep.id} className={`dep-card ${dep.status}`}>
+        {sorted.map((dep) => {
+          const isPast = new Date(dep.dateISO) < today;
+          return (
+          <li key={dep.id} className={`dep-card ${dep.status}${isPast ? ' is-past' : ''}`}>
             <div className="dep-date-badge" aria-hidden="true">
               <span className="dep-date-month">{dep.monthShort}</span>
               <span className="dep-date-day">{dep.day}</span>
@@ -76,10 +91,18 @@ export function DepartureList({ destination }: { destination: Destination }) {
                   </span>
                 )}
               </div>
-              <StatusBadge status={dep.status} />
+              <StatusBadge status={dep.status} isPast={isPast} />
             </div>
             <div className="dep-action">
-              {dep.status === 'full' ? (
+              {isPast ? (
+                <span
+                  className="btn-outline-dark"
+                  aria-disabled="true"
+                  style={{ pointerEvents: 'none', opacity: 0.5 }}
+                >
+                  Lejárt
+                </span>
+              ) : dep.status === 'full' ? (
                 <span
                   className="btn-outline-dark"
                   aria-disabled="true"
@@ -98,7 +121,8 @@ export function DepartureList({ destination }: { destination: Destination }) {
               )}
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </section>
   );

@@ -72,6 +72,7 @@ export async function submitBooking(
     .select({
       destinationTitle: destinations.title,
       dateLabel: departures.dateLabel,
+      dateISO: departures.dateISO,
     })
     .from(departures)
     .innerJoin(destinations, eq(destinations.id, departures.destinationId))
@@ -80,6 +81,15 @@ export async function submitBooking(
 
   if (!snapshot) {
     return { ok: false, error: 'A választott időpont már nem elérhető.' };
+  }
+
+  // Lejárt indulásra nem fogadunk el foglalást.
+  const todayISO = new Date().toISOString().slice(0, 10);
+  if (snapshot.dateISO < todayISO) {
+    return {
+      ok: false,
+      error: 'A választott időpont már lejárt – kérlek válassz egy aktuális indulást.',
+    };
   }
 
   await db.insert(bookings).values({
