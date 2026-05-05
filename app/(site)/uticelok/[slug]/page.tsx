@@ -15,8 +15,19 @@ import type { DestinationBodyBlock } from '@/lib/destinations';
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  const slugs = await getAllDestinationSlugs();
-  return slugs.map((slug) => ({ slug }));
+  // Build-időben a DB nem feltétlenül érhető el (pl. ha nincs DATABASE_URL).
+  // Ilyenkor üres listát adunk vissza – az oldalak ISR-rel készülnek el
+  // a futás során, az első kérésre.
+  try {
+    const slugs = await getAllDestinationSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch (err) {
+    console.warn(
+      '[generateStaticParams] DB nem elérhető build-időben, ISR-re hagyatkozunk:',
+      err,
+    );
+    return [];
+  }
 }
 
 export async function generateMetadata(
