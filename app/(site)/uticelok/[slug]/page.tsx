@@ -13,6 +13,7 @@ import {
 import type { DestinationBodyBlock } from '@/lib/destinations';
 
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   // Build-időben a DB nem feltétlenül érhető el (pl. ha nincs DATABASE_URL).

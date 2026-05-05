@@ -6,6 +6,7 @@ import { getAllDestinations } from '@/lib/data/destinations';
 import { sortByNextDeparture } from '@/lib/destinations';
 
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Úticélok',

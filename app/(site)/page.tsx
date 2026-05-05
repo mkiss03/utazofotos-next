@@ -11,6 +11,8 @@ import { getSiteContent } from '@/lib/site-content';
 
 // ISR: 60 másodpercenként újragenerálódik, ha az admin szerkesztett.
 export const revalidate = 60;
+// Build-időben ne pre-rendereljük; első kérésre fut le, és onnantól ISR.
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const [all, hero] = await Promise.all([

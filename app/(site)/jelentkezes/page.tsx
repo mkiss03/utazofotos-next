@@ -5,6 +5,7 @@ import { BookingFormWrapper } from './BookingFormWrapper';
 import { getAllDestinations } from '@/lib/data/destinations';
 
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Jelentkezés',
