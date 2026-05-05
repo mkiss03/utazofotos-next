@@ -13,6 +13,12 @@ try {
 
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    serverActions: {
+      // Képfeltöltés (admin médiatár) — alapból Next.js 1 MB-ra korlátozza.
+      bodySizeLimit: '15mb',
+    },
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: supabaseHost
