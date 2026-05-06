@@ -2315,3 +2315,260 @@ a.td-side-info-value:hover { color: var(--accent); }
   padding: 10px 16px;
   font-size: .92rem;
 }
+
+/* =============================================
+   ÉVES MENETREND — interaktív naptár
+   ============================================= */
+.sched-cal {
+  max-width: 980px;
+  margin: 0 auto 40px;
+  padding: 0 var(--container-pad);
+}
+
+.sched-cal-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.sched-cal-years {
+  display: inline-flex;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 2px;
+}
+.sched-cal-year {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: var(--trans);
+}
+.sched-cal-year:hover { color: var(--accent); }
+.sched-cal-year.is-active {
+  background: var(--accent);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+
+.sched-cal-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .92rem;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+.sched-cal-toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+.sched-cal-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  border-radius: var(--radius);
+  font-size: .96rem;
+  margin-bottom: 24px;
+}
+.sched-cal-summary svg { color: var(--accent); flex-shrink: 0; }
+
+.sched-cal-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--light);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+}
+.sched-cal-empty svg { color: var(--muted); margin-bottom: 12px; }
+.sched-cal-empty p { margin: 0; }
+
+.sched-cal-months {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.sched-cal-month {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(20,30,50,.04);
+}
+.sched-cal-month-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px 22px;
+  background: linear-gradient(to right, var(--accent-soft) 0%, transparent 70%);
+  border-bottom: 1px solid var(--border);
+}
+.sched-cal-month-name {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+.sched-cal-month-count {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sched-cal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sched-cal-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  transition: background .2s ease;
+}
+.sched-cal-row:last-child { border-bottom: 0; }
+.sched-cal-row:hover { background: var(--light); }
+.sched-cal-row.is-past { opacity: .6; }
+
+.sched-cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--white);
+  border-radius: 12px;
+  padding: 10px 6px;
+  min-width: 64px;
+  line-height: 1;
+}
+.sched-cal-row.status-available .sched-cal-day { background: var(--accent); }
+.sched-cal-row.status-few .sched-cal-day { background: var(--warn); }
+.sched-cal-row.status-full .sched-cal-day,
+.sched-cal-row.is-past .sched-cal-day { background: var(--muted); }
+.sched-cal-day-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.sched-cal-day-end {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  margin-top: 2px;
+  opacity: .9;
+}
+
+.sched-cal-main { min-width: 0; }
+.sched-cal-title {
+  display: inline-block;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  margin-bottom: 4px;
+  letter-spacing: -.005em;
+}
+.sched-cal-title:hover { color: var(--accent); }
+.sched-cal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.sched-cal-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.sched-cal-meta svg { color: var(--accent); }
+.sched-cal-note {
+  font-size: .85rem;
+  color: var(--muted);
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+.sched-cal-status { display: flex; align-items: center; }
+.sched-cal-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.sched-cal-pill.is-ok { background: var(--success); color: var(--white); }
+.sched-cal-pill.is-few { background: var(--warn); color: var(--white); }
+.sched-cal-pill.is-full { background: var(--border); color: var(--muted); }
+.sched-cal-pill.is-past { background: var(--light); color: var(--muted); border: 1px solid var(--border); }
+
+.sched-cal-cta { display: flex; align-items: center; }
+.sched-cal-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  font-size: .9rem;
+  white-space: nowrap;
+}
+.sched-cal-disabled {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--light);
+}
+
+@media (max-width: 760px) {
+  .sched-cal-row {
+    grid-template-columns: 64px minmax(0, 1fr);
+    grid-template-areas:
+      "day main"
+      "day status"
+      "cta cta";
+    column-gap: 14px;
+    row-gap: 8px;
+    padding: 14px 16px;
+  }
+  .sched-cal-day { grid-area: day; align-self: start; }
+  .sched-cal-main { grid-area: main; }
+  .sched-cal-status { grid-area: status; }
+  .sched-cal-cta { grid-area: cta; }
+  .sched-cal-book,
+  .sched-cal-disabled {
+    width: 100%;
+    justify-content: center;
+  }
+  .sched-cal-month-head { padding: 14px 16px; }
+  .sched-cal-month-name { font-size: 1.2rem; }
+  .sched-cal-toolbar { flex-direction: column; align-items: stretch; }
+  .sched-cal-years { justify-content: center; }
+}

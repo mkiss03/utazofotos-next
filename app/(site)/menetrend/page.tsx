@@ -1,25 +1,49 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Footer } from '@/components/Footer';
 import { EditableRegion } from '@/components/admin/EditableRegion';
 import { ScheduleEditor } from '@/app/admin/(protected)/oldalak/ScheduleEditor';
 import { ContactEditor } from '@/app/admin/(protected)/beallitasok/ContactEditor';
+import {
+  ScheduleCalendar,
+  type ScheduleEntry,
+} from '@/components/ScheduleCalendar';
 import { getSiteContent } from '@/lib/site-content';
+import { getAllDestinations } from '@/lib/data/destinations';
 
 export const metadata: Metadata = {
   title: 'Éves menetrend',
-  description: 'Tervezz előre – az UtazóFotós 2025–2026-os menetrendje.',
+  description: 'Tervezz előre – az UtazóFotós menetrendje, interaktív naptárral.',
 };
 
 export const revalidate = 60;
 export const dynamic = 'force-dynamic';
 
 export default async function MenetrendPage() {
-  const [schedule, contact] = await Promise.all([
+  const [schedule, contact, destinations] = await Promise.all([
     getSiteContent('schedule'),
     getSiteContent('contact'),
+    getAllDestinations(),
   ]);
+
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const entries: ScheduleEntry[] = destinations.flatMap((d) =>
+    d.departures.map((dep) => ({
+      id: dep.id,
+      destinationSlug: d.slug,
+      destinationTitle: d.title,
+      region: d.region,
+      dateISO: dep.dateISO,
+      dateLabel: dep.dateLabel,
+      monthShort: dep.monthShort,
+      day: dep.day,
+      durationDays: dep.durationDays,
+      priceFrom: dep.priceFrom,
+      status: dep.status,
+      note: dep.note,
+      isPast: dep.dateISO < todayISO,
+    })),
+  );
 
   const phoneHref = `tel:${contact.phone.replace(/[^+\d]/g, '')}`;
 
@@ -36,14 +60,8 @@ export default async function MenetrendPage() {
           <div className="ph-div" />
         </div>
         <div className="sched-wrap">
-          <div className="sched-img-wrap">
-            <Image
-              src={schedule.imageUrl}
-              alt={schedule.imageAlt}
-              fill
-              sizes="(max-width: 720px) 92vw, 840px"
-            />
-          </div>
+          <ScheduleCalendar entries={entries} />
+
           <EditableRegion
             label="Elérhetőségek szerkesztése"
             modalTitle="Kapcsolati adatok"
