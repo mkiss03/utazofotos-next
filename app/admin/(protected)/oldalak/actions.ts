@@ -91,8 +91,6 @@ export async function saveAbout(prev: SaveState, formData: FormData): Promise<Sa
 const scheduleSchema = z.object({
   title: z.string().trim().min(1).max(120),
   subtitle: z.string().trim().max(200),
-  imageUrl: urlOrPath,
-  imageAlt: z.string().trim().max(200),
 });
 
 export async function saveSchedule(
@@ -103,8 +101,6 @@ export async function saveSchedule(
   const parsed = scheduleSchema.safeParse({
     title: formData.get('title'),
     subtitle: formData.get('subtitle'),
-    imageUrl: formData.get('imageUrl'),
-    imageAlt: formData.get('imageAlt'),
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? 'Hibás adatok.' };

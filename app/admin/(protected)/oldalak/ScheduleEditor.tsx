@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useTransition, useActionState } from 'react';
-import Image from 'next/image';
-import { Save, Loader2 } from 'lucide-react';
-import { MediaPicker } from '@/components/admin/MediaPicker';
+import { Save, Loader2, Info } from 'lucide-react';
 import { saveSchedule, type SaveState } from './actions';
 import type { ScheduleContent } from '@/lib/site-content';
 
@@ -14,8 +12,6 @@ export function ScheduleEditor({ initial: data }: { initial: ScheduleContent }) 
   const [isPending, startTransition] = useTransition();
   const [title, setTitle] = useState(data.title);
   const [subtitle, setSubtitle] = useState(data.subtitle);
-  const [imageUrl, setImageUrl] = useState(data.imageUrl);
-  const [imageAlt, setImageAlt] = useState(data.imageAlt);
 
   function submit(fd: FormData) {
     startTransition(() => action(fd));
@@ -46,30 +42,25 @@ export function ScheduleEditor({ initial: data }: { initial: ScheduleContent }) 
       </div>
 
       <div className="admin-field admin-field-wide">
-        <label>Menetrend kép (pl. PDF helyett kép)</label>
-        <input type="hidden" name="imageUrl" value={imageUrl} />
-        <input type="hidden" name="imageAlt" value={imageAlt} />
-        {imageUrl && (
-          <div className="admin-cover-preview">
-            <Image src={imageUrl} alt={imageAlt || 'Menetrend'} fill sizes="600px" unoptimized />
-          </div>
-        )}
-        <MediaPicker
-          onPick={({ url, alt }) => {
-            setImageUrl(url);
-            if (alt) setImageAlt(alt);
+        <div
+          style={{
+            display: 'flex',
+            gap: 10,
+            alignItems: 'flex-start',
+            padding: '12px 14px',
+            background: 'var(--accent-soft)',
+            borderRadius: 8,
+            fontSize: '.9rem',
+            lineHeight: 1.5,
           }}
-          buttonLabel={imageUrl ? 'Másik kép választása' : 'Kép választása'}
-        />
-      </div>
-      <div className="admin-field admin-field-wide">
-        <label htmlFor="sched-alt">Kép alt szövege</label>
-        <input
-          id="sched-alt"
-          type="text"
-          value={imageAlt}
-          onChange={(e) => setImageAlt(e.target.value)}
-        />
+        >
+          <Info size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--accent)' }} />
+          <div>
+            A naptár automatikusan az úticélok indulásaiból épül fel. Új
+            időpont, státusz, megjegyzés vagy időtartam felvétele:{' '}
+            <strong>Úticélok → [úticél] → Indulási időpontok</strong>.
+          </div>
+        </div>
       </div>
 
       <div className="admin-form-bar admin-field-wide">

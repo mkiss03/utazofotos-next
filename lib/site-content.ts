@@ -35,8 +35,6 @@ export type AboutContent = {
 export type ScheduleContent = {
   title: string;
   subtitle: string;
-  imageUrl: string;
-  imageAlt: string;
 };
 
 export type ContactContent = {
@@ -75,9 +73,7 @@ export const DEFAULTS: SiteContentMap = {
   },
   schedule: {
     title: 'Éves menetrend',
-    subtitle: 'Tervezz előre – 2025–2026',
-    imageUrl: '/images/menetrend.png',
-    imageAlt: 'Éves menetrend',
+    subtitle: 'Tervezz előre – válassz egy időpontot a naptárból.',
   },
   contact: {
     phone: '+36 30 247 3323',
