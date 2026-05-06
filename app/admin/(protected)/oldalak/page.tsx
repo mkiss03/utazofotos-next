@@ -2,14 +2,16 @@ import { getSiteContent } from '@/lib/site-content';
 import { HeroEditor } from './HeroEditor';
 import { AboutEditor } from './AboutEditor';
 import { ScheduleEditor } from './ScheduleEditor';
+import { TestimonialsEditor } from './TestimonialsEditor';
 
 export const dynamic = 'force-dynamic';
 
 export default async function OldalakPage() {
-  const [hero, about, schedule] = await Promise.all([
+  const [hero, about, schedule, testimonials] = await Promise.all([
     getSiteContent('hero'),
     getSiteContent('about'),
     getSiteContent('schedule'),
+    getSiteContent('testimonials'),
   ]);
 
   return (
@@ -25,6 +27,11 @@ export default async function OldalakPage() {
       <section className="admin-section">
         <h2 className="admin-section-title">Kezdőlap – hero szakasz</h2>
         <HeroEditor initial={hero} />
+      </section>
+
+      <section className="admin-section">
+        <h2 className="admin-section-title">Kezdőlap – vélemények és galéria</h2>
+        <TestimonialsEditor initial={testimonials} />
       </section>
 
       <section className="admin-section">

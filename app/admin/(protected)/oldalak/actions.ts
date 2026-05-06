@@ -110,6 +110,47 @@ export async function saveSchedule(
   return { ok: true };
 }
 
+const testimonialEntrySchema = z.object({
+  id: z.string().trim().min(1).max(64),
+  name: z.string().trim().min(1, 'A név nem lehet üres.').max(120),
+  trip: z.string().trim().max(200),
+  quote: z.string().trim().min(1, 'Az idézet nem lehet üres.').max(2000),
+  photoUrl: urlOrPath,
+  photoAlt: z.string().trim().max(200),
+  rating: z.coerce.number().int().min(0).max(5).optional(),
+});
+
+const testimonialsSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  subtitle: z.string().trim().max(300),
+  items: z.array(testimonialEntrySchema).max(30),
+});
+
+export async function saveTestimonials(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const userId = await requireAdmin();
+  const itemsJson = formData.get('items');
+  let items: unknown = [];
+  try {
+    items = JSON.parse(typeof itemsJson === 'string' ? itemsJson : '[]');
+  } catch {
+    return { ok: false, error: 'A vélemények formátuma hibás.' };
+  }
+  const parsed = testimonialsSchema.safeParse({
+    title: formData.get('title'),
+    subtitle: formData.get('subtitle'),
+    items,
+  });
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Hibás adatok.' };
+  }
+  await setSiteContent('testimonials', parsed.data, userId);
+  revalidatePath('/');
+  return { ok: true };
+}
+
 const contactSchema = z.object({
   phone: z.string().trim().min(3, 'Telefonszám szükséges.').max(60),
   email: z.string().trim().email('Érvénytelen e-mail.').max(255),
