@@ -5,9 +5,10 @@ import { DestinationCard } from '@/components/DestinationCard';
 import { FBanner, Footer } from '@/components/Footer';
 import { EditableRegion } from '@/components/admin/EditableRegion';
 import { HeroEditor } from '@/app/admin/(protected)/oldalak/HeroEditor';
+import { TestimonialsGallery } from '@/components/TestimonialsGallery';
 import { getAllDestinations } from '@/lib/data/destinations';
 import { sortByNextDeparture } from '@/lib/destinations';
-import { getSiteContent } from '@/lib/site-content';
+import { getSiteContentMany } from '@/lib/site-content';
 
 // ISR: 60 másodpercenként újragenerálódik, ha az admin szerkesztett.
 export const revalidate = 60;
@@ -15,10 +16,11 @@ export const revalidate = 60;
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const [all, hero] = await Promise.all([
+  const [all, content] = await Promise.all([
     getAllDestinations(),
-    getSiteContent('hero'),
+    getSiteContentMany(['hero', 'testimonials']),
   ]);
+  const { hero, testimonials } = content;
   const upcoming = sortByNextDeparture(all).slice(0, 4);
 
   return (
@@ -66,6 +68,8 @@ export default async function HomePage() {
           </Link>
         </div>
       </div>
+
+      <TestimonialsGallery data={testimonials} />
 
       <FBanner />
       <Footer />

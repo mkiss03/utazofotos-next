@@ -37,6 +37,22 @@ export type ScheduleContent = {
   subtitle: string;
 };
 
+export type TestimonialEntry = {
+  id: string;
+  name: string;
+  trip: string;
+  quote: string;
+  photoUrl: string;
+  photoAlt: string;
+  rating?: number;
+};
+
+export type TestimonialsContent = {
+  title: string;
+  subtitle: string;
+  items: TestimonialEntry[];
+};
+
 export type ContactContent = {
   phone: string;
   email: string;
@@ -48,6 +64,7 @@ export type SiteContentMap = {
   hero: HeroContent;
   about: AboutContent;
   schedule: ScheduleContent;
+  testimonials: TestimonialsContent;
   contact: ContactContent;
 };
 
@@ -74,6 +91,53 @@ export const DEFAULTS: SiteContentMap = {
   schedule: {
     title: 'Éves menetrend',
     subtitle: 'Tervezz előre – válassz egy időpontot a naptárból.',
+  },
+  testimonials: {
+    title: 'Vendégeink mesélik',
+    subtitle:
+      'Néhány őszinte sor azoktól, akik már együtt utaztak velünk – és pár kép az élményekből.',
+    items: [
+      {
+        id: 't1',
+        name: 'Anna',
+        trip: 'Toszkána – 2025 ősz',
+        quote:
+          '„Olyan volt, mint egy hosszú baráti utazás: minden helyszín gondosan előkészítve, minden étterem megérte. A képek pedig… azokat soha nem csináltam volna meg magamnak.”',
+        photoUrl: '/images/toscana.jpeg',
+        photoAlt: 'Toszkán dombok napsütésben',
+        rating: 5,
+      },
+      {
+        id: 't2',
+        name: 'Eszter',
+        trip: 'Nápoly–Amalfi–Capri',
+        quote:
+          '„Sosem hittem, hogy egy utazás után ennyire feltöltődve jövök haza. Zsuzsi tényleg odafigyel a részletekre, és úgy fényképezett, hogy közben végig önmagam maradtam.”',
+        photoUrl: '/images/napoly.jpeg',
+        photoAlt: 'Amalfi-part kilátás',
+        rating: 5,
+      },
+      {
+        id: 't3',
+        name: 'Katalin',
+        trip: 'Szicília – narancsszüret',
+        quote:
+          '„A program tökéletesen kiegyensúlyozott volt: kultúra, kaja, pihenés – és minden nap volt egy „ezt sose felejtem el” pillanat. Szívből ajánlom mindenkinek.”',
+        photoUrl: '/images/szicilia.jpeg',
+        photoAlt: 'Szicíliai narancsliget',
+        rating: 5,
+      },
+      {
+        id: 't4',
+        name: 'Mária',
+        trip: 'Róma',
+        quote:
+          '„Először mentem egyedül kiscsoportos útra, és a végére úgy éreztem, családtaggal jöttem haza. A fotók pedig olyan emlékek, amiket most már soha nem veszítek el.”',
+        photoUrl: '/images/roma.jpeg',
+        photoAlt: 'Római utca esti fényben',
+        rating: 5,
+      },
+    ],
   },
   contact: {
     phone: '+36 30 247 3323',
