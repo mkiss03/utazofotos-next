@@ -85,6 +85,8 @@ export default async function EditDestinationPage({
             durationDays: d.durationDays,
             priceFrom: d.priceFrom,
             status: d.status,
+            transportMode: d.transportMode,
+            maxPeople: d.maxPeople,
             note: d.note,
           }))}
         />

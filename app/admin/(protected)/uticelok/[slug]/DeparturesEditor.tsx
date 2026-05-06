@@ -10,6 +10,9 @@ import {
   X,
   CalendarDays,
   CircleDot,
+  Plane,
+  Bus,
+  Users,
 } from 'lucide-react';
 import {
   createDeparture,
@@ -28,6 +31,8 @@ type Departure = {
   durationDays: number | null;
   priceFrom: string | null;
   status: 'available' | 'few' | 'full';
+  transportMode: 'plane' | 'bus' | 'mixed';
+  maxPeople: number | null;
   note: string | null;
 };
 
@@ -35,6 +40,12 @@ const STATUS_LABEL: Record<Departure['status'], string> = {
   available: 'Szabad helyek',
   few: 'Utolsó helyek',
   full: 'Megtelt',
+};
+
+const TRANSPORT_LABEL: Record<Departure['transportMode'], string> = {
+  plane: 'Repülő',
+  bus: 'Autóbusz',
+  mixed: 'Vegyes',
 };
 
 export function DeparturesEditor({
@@ -167,9 +178,16 @@ function DepartureRow({
         </div>
         <div className="admin-departure-meta">
           <StatusPill status={departure.status} />
+          <TransportPill mode={departure.transportMode} />
           {departure.priceFrom && <span>{departure.priceFrom}</span>}
           {departure.durationDays && (
             <span>{departure.durationDays} napos</span>
+          )}
+          {departure.maxPeople && (
+            <span>
+              <Users size={12} aria-hidden="true" style={{ marginRight: 4, verticalAlign: -1 }} />
+              max. {departure.maxPeople} fő
+            </span>
           )}
           {departure.note && <span>📝 {departure.note}</span>}
         </div>
@@ -201,6 +219,16 @@ function StatusPill({ status }: { status: Departure['status'] }) {
   );
 }
 
+function TransportPill({ mode }: { mode: Departure['transportMode'] }) {
+  const Icon = mode === 'bus' ? Bus : mode === 'mixed' ? Bus : Plane;
+  return (
+    <span className="admin-pill admin-pill-info">
+      <Icon size={10} aria-hidden="true" style={{ marginRight: 4, verticalAlign: -1 }} />
+      {TRANSPORT_LABEL[mode]}
+    </span>
+  );
+}
+
 function DepartureForm({
   mode,
   initial,
@@ -226,6 +254,12 @@ function DepartureForm({
   const [status, setStatus] = useState<Departure['status']>(
     initial?.status ?? 'available',
   );
+  const [transportMode, setTransportMode] = useState<Departure['transportMode']>(
+    initial?.transportMode ?? 'plane',
+  );
+  const [maxPeople, setMaxPeople] = useState(
+    initial?.maxPeople?.toString() ?? '',
+  );
   const [note, setNote] = useState(initial?.note ?? '');
 
   const [isPending, startTransition] = useTransition();
@@ -239,6 +273,8 @@ function DepartureForm({
     fd.set('durationDays', durationDays);
     fd.set('priceFrom', priceFrom);
     fd.set('status', status);
+    fd.set('transportMode', transportMode);
+    fd.set('maxPeople', maxPeople);
     fd.set('note', note);
     return fd;
   }
@@ -267,6 +303,8 @@ function DepartureForm({
           durationDays: durationDays ? parseInt(durationDays, 10) : null,
           priceFrom: priceFrom || null,
           status,
+          transportMode,
+          maxPeople: maxPeople ? parseInt(maxPeople, 10) : null,
           note: note || null,
         };
         onSaved(dummy);
@@ -332,6 +370,33 @@ function DepartureForm({
             <option value="few">Utolsó helyek</option>
             <option value="full">Megtelt</option>
           </select>
+        </div>
+        <div className="admin-field">
+          <label>Közlekedési mód</label>
+          <select
+            value={transportMode}
+            onChange={(e) =>
+              setTransportMode(e.target.value as Departure['transportMode'])
+            }
+          >
+            <option value="plane">Repülő</option>
+            <option value="bus">Autóbusz</option>
+            <option value="mixed">Vegyes</option>
+          </select>
+          <p className="admin-field-hint">
+            A naptárban ennek megfelelő ikon jelenik meg.
+          </p>
+        </div>
+        <div className="admin-field">
+          <label>Max. létszám (opcionális)</label>
+          <input
+            type="number"
+            min={1}
+            max={999}
+            value={maxPeople}
+            onChange={(e) => setMaxPeople(e.target.value)}
+            placeholder="Pl. 14"
+          />
         </div>
         <div className="admin-field admin-field-wide">
           <label>Megjegyzés (opcionális)</label>

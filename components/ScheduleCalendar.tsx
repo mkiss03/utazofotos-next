@@ -10,6 +10,8 @@ import {
   MapPin,
   ArrowRight,
   X,
+  Users,
+  Wallet,
 } from 'lucide-react';
 
 export interface ScheduleEntry {
@@ -24,6 +26,8 @@ export interface ScheduleEntry {
   durationDays?: number;
   priceFrom?: string;
   status: 'available' | 'few' | 'full';
+  transportMode: 'plane' | 'bus' | 'mixed';
+  maxPeople?: number;
   note?: string;
   isPast: boolean;
 }
@@ -49,13 +53,7 @@ interface Props {
   entries: ScheduleEntry[];
 }
 
-type Transport = 'plane' | 'bus';
-
-function detectTransport(e: ScheduleEntry): Transport {
-  const note = (e.note ?? '').toLowerCase();
-  if (note.includes('busz') || note.includes('autóbusz')) return 'bus';
-  return 'plane';
-}
+type Transport = 'plane' | 'bus' | 'mixed';
 
 function TransportIcon({
   mode,
@@ -64,11 +62,9 @@ function TransportIcon({
   mode: Transport;
   size?: number;
 }) {
-  return mode === 'bus' ? (
-    <Bus size={size} aria-label="Autóbuszos" />
-  ) : (
-    <Plane size={size} aria-label="Repülős" />
-  );
+  if (mode === 'bus') return <Bus size={size} aria-label="Autóbuszos" />;
+  if (mode === 'mixed') return <Bus size={size} aria-label="Vegyes közlekedés" />;
+  return <Plane size={size} aria-label="Repülős" />;
 }
 
 function parseISO(iso: string) {
@@ -142,7 +138,7 @@ function DayModal({
           ) : (
             <ul className="cal2-panel-list cal2-modal-list">
               {entries.map((e) => {
-                const transport = detectTransport(e);
+                const transport = e.transportMode;
                 const isFull = e.status === 'full';
                 return (
                   <li
@@ -172,6 +168,18 @@ function DayModal({
                           <span>
                             <Clock size={14} />
                             {e.durationDays} nap
+                          </span>
+                        )}
+                        {e.priceFrom && (
+                          <span>
+                            <Wallet size={14} />
+                            {e.priceFrom}
+                          </span>
+                        )}
+                        {e.maxPeople && (
+                          <span>
+                            <Users size={14} />
+                            max. {e.maxPeople} fő
                           </span>
                         )}
                       </div>
@@ -418,7 +426,7 @@ function MiniMonth({
             );
           }
           const status = bestStatus(list!);
-          const transport = detectTransport(list![0]);
+          const transport = list![0].transportMode;
           return (
             <button
               key={i}
@@ -476,7 +484,7 @@ function DetailPanel({
       ) : (
         <ul className="cal2-panel-list">
           {entries.map((e) => {
-            const transport = detectTransport(e);
+            const transport = e.transportMode;
             const isFull = e.status === 'full';
             return (
               <li
@@ -506,6 +514,18 @@ function DetailPanel({
                       <span>
                         <Clock size={13} />
                         {e.durationDays} nap
+                      </span>
+                    )}
+                    {e.priceFrom && (
+                      <span>
+                        <Wallet size={13} />
+                        {e.priceFrom}
+                      </span>
+                    )}
+                    {e.maxPeople && (
+                      <span>
+                        <Users size={13} />
+                        max. {e.maxPeople} fő
                       </span>
                     )}
                   </div>

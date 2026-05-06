@@ -7,6 +7,7 @@
  */
 
 export type DepartureStatus = 'available' | 'few' | 'full';
+export type TransportMode = 'plane' | 'bus' | 'mixed';
 
 export interface Departure {
   id: string;
@@ -17,6 +18,8 @@ export interface Departure {
   durationDays?: number;
   priceFrom?: string;
   status: DepartureStatus;
+  transportMode: TransportMode;
+  maxPeople?: number;
   note?: string;
 }
 

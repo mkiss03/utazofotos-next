@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CalendarDays, Clock, CheckCircle2, AlertCircle, XCircle, Info, History } from 'lucide-react';
+import { CalendarDays, Clock, CheckCircle2, AlertCircle, XCircle, Info, History, Plane, Bus, Users } from 'lucide-react';
 import {
   type Destination,
   type Departure,
@@ -83,7 +83,27 @@ export function DepartureList({ destination }: { destination: Destination }) {
                     {dep.durationDays} nap
                   </span>
                 )}
+                <span>
+                  {dep.transportMode === 'bus' ? (
+                    <Bus size={14} aria-hidden="true" />
+                  ) : dep.transportMode === 'mixed' ? (
+                    <Bus size={14} aria-hidden="true" />
+                  ) : (
+                    <Plane size={14} aria-hidden="true" />
+                  )}
+                  {dep.transportMode === 'bus'
+                    ? 'Autóbusz'
+                    : dep.transportMode === 'mixed'
+                      ? 'Vegyes'
+                      : 'Repülő'}
+                </span>
                 {dep.priceFrom && <span>Ártól: {dep.priceFrom}</span>}
+                {dep.maxPeople && (
+                  <span>
+                    <Users size={14} aria-hidden="true" />
+                    max. {dep.maxPeople} fő
+                  </span>
+                )}
                 {dep.note && (
                   <span>
                     <Info size={14} aria-hidden="true" />

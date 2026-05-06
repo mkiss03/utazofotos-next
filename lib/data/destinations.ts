@@ -10,6 +10,7 @@ import type {
   Departure,
   DestinationBodyBlock,
   DepartureStatus,
+  TransportMode,
 } from '@/lib/destinations';
 
 /**
@@ -43,6 +44,8 @@ interface DbDepRow {
   durationDays: number | null;
   priceFrom: string | null;
   status: DepartureStatus;
+  transportMode: TransportMode;
+  maxPeople: number | null;
   note: string | null;
 }
 
@@ -56,6 +59,8 @@ function mapDeparture(d: DbDepRow): Departure {
     durationDays: d.durationDays ?? undefined,
     priceFrom: d.priceFrom ?? undefined,
     status: d.status,
+    transportMode: d.transportMode,
+    maxPeople: d.maxPeople ?? undefined,
     note: d.note ?? undefined,
   };
 }
@@ -107,6 +112,8 @@ export async function getAllDestinations(): Promise<Destination[]> {
       durationDays: depSchema.durationDays,
       priceFrom: depSchema.priceFrom,
       status: depSchema.status,
+      transportMode: depSchema.transportMode,
+      maxPeople: depSchema.maxPeople,
       note: depSchema.note,
     })
     .from(depSchema);
@@ -147,6 +154,8 @@ export async function getDestinationBySlug(
       durationDays: depSchema.durationDays,
       priceFrom: depSchema.priceFrom,
       status: depSchema.status,
+      transportMode: depSchema.transportMode,
+      maxPeople: depSchema.maxPeople,
       note: depSchema.note,
     })
     .from(depSchema)

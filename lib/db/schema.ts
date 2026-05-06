@@ -85,6 +85,8 @@ export const departureStatusEnum = pgEnum('departure_status', [
   'full',
 ]);
 
+export const transportModeEnum = pgEnum('transport_mode', ['plane', 'bus', 'mixed']);
+
 export const departures = pgTable(
   'departures',
   {
@@ -102,6 +104,8 @@ export const departures = pgTable(
     durationDays: integer('duration_days'),
     priceFrom: varchar('price_from', { length: 60 }), // pl. "189 000 Ft"
     status: departureStatusEnum('status').notNull().default('available'),
+    transportMode: transportModeEnum('transport_mode').notNull().default('plane'),
+    maxPeople: integer('max_people'),
     note: varchar('note', { length: 200 }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),

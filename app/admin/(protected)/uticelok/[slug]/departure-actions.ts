@@ -81,6 +81,11 @@ const departureSchema = z.object({
     .transform((v) => (v === '' || v === undefined ? null : (v as number))),
   priceFrom: z.string().trim().max(60),
   status: z.enum(['available', 'few', 'full']),
+  transportMode: z.enum(['plane', 'bus', 'mixed']),
+  maxPeople: z
+    .union([z.coerce.number().int().min(1).max(999), z.literal('')])
+    .optional()
+    .transform((v) => (v === '' || v === undefined ? null : (v as number))),
   note: z.string().trim().max(200),
 });
 
@@ -107,6 +112,8 @@ function parseFormData(formData: FormData) {
     durationDays: (formData.get('durationDays') ?? '') as string,
     priceFrom: String(formData.get('priceFrom') ?? ''),
     status: String(formData.get('status') ?? 'available'),
+    transportMode: String(formData.get('transportMode') ?? 'plane'),
+    maxPeople: (formData.get('maxPeople') ?? '') as string,
     note: String(formData.get('note') ?? ''),
   };
 }
@@ -138,6 +145,8 @@ export async function createDeparture(
     durationDays: d.durationDays,
     priceFrom: d.priceFrom || null,
     status: d.status,
+    transportMode: d.transportMode,
+    maxPeople: d.maxPeople,
     note: d.note || null,
   });
 
@@ -174,6 +183,8 @@ export async function updateDeparture(
       durationDays: d.durationDays,
       priceFrom: d.priceFrom || null,
       status: d.status,
+      transportMode: d.transportMode,
+      maxPeople: d.maxPeople,
       note: d.note || null,
       updatedAt: new Date(),
     })

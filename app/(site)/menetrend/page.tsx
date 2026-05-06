@@ -40,6 +40,8 @@ export default async function MenetrendPage() {
       durationDays: dep.durationDays,
       priceFrom: dep.priceFrom,
       status: dep.status,
+      transportMode: dep.transportMode,
+      maxPeople: dep.maxPeople,
       note: dep.note,
       isPast: dep.dateISO < todayISO,
     })),
