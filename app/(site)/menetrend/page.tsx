@@ -59,9 +59,10 @@ export default async function MenetrendPage() {
           <p>{schedule.subtitle}</p>
           <div className="ph-div" />
         </div>
-        <div className="sched-wrap">
-          <ScheduleCalendar entries={entries} />
 
+        <ScheduleCalendar entries={entries} />
+
+        <div className="sched-wrap">
           <EditableRegion
             label="Elérhetőségek szerkesztése"
             modalTitle="Kapcsolati adatok"
