@@ -2572,3 +2572,277 @@ a.td-side-info-value:hover { color: var(--accent); }
   .sched-cal-toolbar { flex-direction: column; align-items: stretch; }
   .sched-cal-years { justify-content: center; }
 }
+
+/* =============================================
+   ÉVES NAPTÁR — 12 hónapos rács, valódi naptár-formátum
+   ============================================= */
+.cal2 {
+  max-width: 1180px;
+  margin: 0 auto 40px;
+  padding: 0 var(--container-pad);
+}
+
+/* Toolbar */
+.cal2-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cal2-years {
+  display: inline-flex;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 2px;
+}
+.cal2-year {
+  appearance: none; border: 0; background: transparent;
+  padding: 8px 22px; border-radius: 999px;
+  font-size: 1rem; font-weight: 700; color: var(--ink);
+  cursor: pointer; transition: var(--trans);
+}
+.cal2-year:hover { color: var(--accent); }
+.cal2-year.is-active { background: var(--accent); color: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+
+.cal2-legend {
+  display: inline-flex; flex-wrap: wrap; align-items: center; gap: 14px;
+  font-size: .82rem; color: var(--muted);
+}
+.cal2-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.cal2-legend-item svg { color: var(--ink); }
+.cal2-legend-sep { width: 1px; height: 14px; background: var(--border); }
+.cal2-dot {
+  display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+}
+.cal2-dot.is-ok { background: var(--success); }
+.cal2-dot.is-few { background: var(--warn); }
+.cal2-dot.is-full { background: var(--muted); }
+
+.cal2-summary {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 16px; background: var(--accent-soft);
+  border-radius: var(--radius); font-size: .96rem;
+  margin-bottom: 22px;
+}
+.cal2-summary svg { color: var(--accent); flex-shrink: 0; }
+
+/* 12 hónap rács */
+.cal2-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 28px;
+}
+@media (max-width: 980px) { .cal2-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .cal2-grid { grid-template-columns: 1fr; } }
+
+.cal2-month {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 14px 12px;
+  box-shadow: 0 1px 4px rgba(20,30,50,.04);
+  transition: opacity .2s ease;
+}
+.cal2-month.is-empty { opacity: .55; }
+
+.cal2-month-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 10px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.cal2-month-name {
+  font-family: var(--serif);
+  font-size: 1.15rem; font-weight: 600;
+  color: var(--ink); letter-spacing: -.01em;
+}
+.cal2-month-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 7px;
+  background: var(--accent); color: var(--white);
+  border-radius: 999px; font-size: .72rem; font-weight: 800;
+}
+
+.cal2-dow {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px; margin-bottom: 4px;
+}
+.cal2-dow span {
+  font-size: .65rem; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--muted);
+  text-align: center; padding: 2px 0;
+}
+
+.cal2-cells {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal2-cell {
+  aspect-ratio: 1; min-height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 600; color: var(--ink);
+  border-radius: 8px; background: transparent; border: 0;
+  position: relative; padding: 0;
+}
+.cal2-cell.is-blank { visibility: hidden; }
+.cal2-cell.is-past:not(.has-event) { color: var(--muted); opacity: .55; }
+.cal2-cell.is-today {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Eseményes nap = klikkelhető gomb */
+button.cal2-cell.has-event {
+  cursor: pointer;
+  flex-direction: column;
+  gap: 1px;
+  color: var(--white);
+  font-weight: 700;
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+button.cal2-cell.has-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.18);
+  filter: brightness(1.05);
+}
+button.cal2-cell.has-event.status-available { background: var(--success); }
+button.cal2-cell.has-event.status-few { background: var(--warn); }
+button.cal2-cell.has-event.status-full { background: var(--muted); }
+button.cal2-cell.has-event.is-past { background: #b0b0b0; opacity: .65; }
+button.cal2-cell.has-event.is-selected {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,.2);
+}
+
+.cal2-cell-num { font-size: .92rem; line-height: 1; }
+.cal2-cell-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  opacity: .92;
+}
+.cal2-cell-badge {
+  position: absolute; top: 2px; right: 2px;
+  min-width: 14px; height: 14px; padding: 0 3px;
+  background: var(--ink); color: var(--white);
+  border-radius: 999px;
+  font-size: .58rem; font-weight: 800;
+  display: inline-flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+
+/* Detail panel */
+.cal2-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 18px rgba(20,30,50,.06);
+  overflow: hidden;
+}
+.cal2-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: linear-gradient(to right, var(--accent-soft) 0%, transparent 70%);
+  border-bottom: 1px solid var(--border);
+}
+.cal2-panel-head h3 {
+  margin: 0; font-family: var(--serif);
+  font-size: 1.15rem; font-weight: 600; color: var(--ink);
+}
+.cal2-panel-close {
+  appearance: none; border: 0; background: transparent;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  color: var(--muted); cursor: pointer; transition: var(--trans);
+}
+.cal2-panel-close:hover { background: var(--light); color: var(--ink); }
+
+.cal2-panel-empty {
+  padding: 32px 20px; text-align: center; color: var(--muted);
+}
+.cal2-panel-list { list-style: none; margin: 0; padding: 0; }
+
+.cal2-panel-item {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background .2s ease;
+}
+.cal2-panel-item:last-child { border-bottom: 0; }
+.cal2-panel-item:hover { background: var(--light); }
+.cal2-panel-item.is-past { opacity: .65; }
+
+.cal2-panel-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent);
+  flex-shrink: 0;
+}
+.cal2-panel-item.status-few .cal2-panel-icon { background: rgba(217,119,6,.12); color: var(--warn); }
+.cal2-panel-item.status-full .cal2-panel-icon,
+.cal2-panel-item.is-past .cal2-panel-icon { background: var(--light); color: var(--muted); }
+
+.cal2-panel-body { min-width: 0; }
+.cal2-panel-title {
+  display: inline-block;
+  font-family: var(--serif); font-size: 1.1rem; font-weight: 600;
+  color: var(--ink); text-decoration: none;
+  margin-bottom: 4px; letter-spacing: -.005em;
+}
+.cal2-panel-title:hover { color: var(--accent); }
+.cal2-panel-meta {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  font-size: .85rem; color: var(--muted);
+}
+.cal2-panel-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.cal2-panel-meta svg { color: var(--accent); }
+.cal2-panel-note { font-size: .85rem; color: var(--muted); margin: 4px 0 0; font-style: italic; }
+
+.cal2-panel-cta {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+}
+.cal2-pill {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: .72rem; font-weight: 700; letter-spacing: .02em; white-space: nowrap;
+}
+.cal2-pill.is-ok { background: var(--success); color: var(--white); }
+.cal2-pill.is-few { background: var(--warn); color: var(--white); }
+.cal2-pill.is-full { background: var(--border); color: var(--muted); }
+.cal2-pill.is-past { background: var(--light); color: var(--muted); border: 1px solid var(--border); }
+
+.cal2-panel-book {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; font-size: .88rem; white-space: nowrap;
+}
+.cal2-panel-disabled {
+  display: inline-flex; align-items: center;
+  padding: 8px 14px; font-size: .88rem; font-weight: 600;
+  color: var(--muted); background: var(--light);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+
+@media (max-width: 600px) {
+  .cal2-panel-item {
+    grid-template-columns: 40px 1fr;
+    grid-template-areas:
+      "icon body"
+      "cta cta";
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .cal2-panel-icon { grid-area: icon; width: 40px; height: 40px; }
+  .cal2-panel-body { grid-area: body; }
+  .cal2-panel-cta { grid-area: cta; flex-direction: row; align-items: center; justify-content: space-between; }
+  .cal2-panel-book, .cal2-panel-disabled { flex: 1; justify-content: center; }
+  .cal2-toolbar { flex-direction: column; align-items: stretch; }
+  .cal2-years { justify-content: center; }
+  .cal2-legend { justify-content: center; }
+}

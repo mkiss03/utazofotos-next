@@ -3,11 +3,13 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
+  Plane,
+  Bus,
   CalendarDays,
   Clock,
   MapPin,
   ArrowRight,
-  CalendarCheck,
+  X,
 } from 'lucide-react';
 
 export interface ScheduleEntry {
@@ -41,217 +43,374 @@ const MONTHS_HU = [
   'December',
 ];
 
+const DOW_HU = ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'];
+
 interface Props {
   entries: ScheduleEntry[];
 }
 
+type Transport = 'plane' | 'bus';
+
+function detectTransport(e: ScheduleEntry): Transport {
+  const note = (e.note ?? '').toLowerCase();
+  if (note.includes('busz') || note.includes('autóbusz')) return 'bus';
+  return 'plane';
+}
+
+function TransportIcon({
+  mode,
+  size = 14,
+}: {
+  mode: Transport;
+  size?: number;
+}) {
+  return mode === 'bus' ? (
+    <Bus size={size} aria-label="Autóbuszos" />
+  ) : (
+    <Plane size={size} aria-label="Repülős" />
+  );
+}
+
+function parseISO(iso: string) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return { y, m: m - 1, d };
+}
+
+function daysInMonth(year: number, monthIdx: number) {
+  return new Date(year, monthIdx + 1, 0).getDate();
+}
+
+function firstWeekdayMon(year: number, monthIdx: number) {
+  const js = new Date(year, monthIdx, 1).getDay();
+  return (js + 6) % 7; // 0 = hétfő
+}
+
+function todayISO() {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+}
+
+function isoFor(y: number, m: number, d: number) {
+  return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+function formatDayHu(iso: string) {
+  const { y, m, d } = parseISO(iso);
+  return `${y}. ${MONTHS_HU[m].toLowerCase()} ${d}.`;
+}
+
+function bestStatus(list: ScheduleEntry[]): 'available' | 'few' | 'full' {
+  if (list.some((e) => e.status === 'available')) return 'available';
+  if (list.some((e) => e.status === 'few')) return 'few';
+  return 'full';
+}
+
 export function ScheduleCalendar({ entries }: Props) {
-  // Évek meghatározása az adatokból
   const years = useMemo(() => {
     const set = new Set(entries.map((e) => e.dateISO.slice(0, 4)));
+    if (set.size === 0) set.add(String(new Date().getFullYear()));
     return [...set].sort();
   }, [entries]);
 
-  // Default: legkorábbi év, amelyikben még van jövőbeli indulás, különben a legnagyobb
   const initialYear = useMemo(() => {
-    const todayISO = new Date().toISOString().slice(0, 10);
-    const upcomingYears = entries
-      .filter((e) => e.dateISO >= todayISO)
+    const today = todayISO();
+    const upcoming = entries
+      .filter((e) => e.dateISO >= today)
       .map((e) => e.dateISO.slice(0, 4));
-    if (upcomingYears.length > 0) {
-      return upcomingYears.sort()[0];
-    }
+    if (upcoming.length > 0) return upcoming.sort()[0];
     return years[years.length - 1] ?? String(new Date().getFullYear());
   }, [entries, years]);
 
-  const [year, setYear] = useState<string>(initialYear);
-  const [showPast, setShowPast] = useState(false);
+  const [yearStr, setYearStr] = useState<string>(initialYear);
+  const year = parseInt(yearStr, 10);
+  const [selectedISO, setSelectedISO] = useState<string | null>(null);
 
   const yearEntries = useMemo(
-    () => entries.filter((e) => e.dateISO.startsWith(year)),
-    [entries, year],
+    () => entries.filter((e) => e.dateISO.startsWith(yearStr)),
+    [entries, yearStr],
   );
 
-  const visibleEntries = useMemo(
-    () => (showPast ? yearEntries : yearEntries.filter((e) => !e.isPast)),
-    [yearEntries, showPast],
-  );
-
+  const todayStr = todayISO();
   const upcomingCount = yearEntries.filter((e) => !e.isPast).length;
-  const pastCount = yearEntries.length - upcomingCount;
 
-  // Hónap szerinti csoportosítás
-  const months = useMemo(() => {
-    const map = new Map<number, ScheduleEntry[]>();
-    for (const e of visibleEntries) {
-      const m = parseInt(e.dateISO.slice(5, 7), 10) - 1;
-      const arr = map.get(m) ?? [];
+  const byDate = useMemo(() => {
+    const map = new Map<string, ScheduleEntry[]>();
+    for (const e of yearEntries) {
+      const arr = map.get(e.dateISO) ?? [];
       arr.push(e);
-      map.set(m, arr);
+      map.set(e.dateISO, arr);
     }
-    // Sorrend: hónapok növekvően; hónapon belül dátum szerint
-    return [...map.entries()]
-      .sort(([a], [b]) => a - b)
-      .map(([m, arr]) => ({
-        idx: m,
-        name: MONTHS_HU[m],
-        entries: arr.sort((a, b) => a.dateISO.localeCompare(b.dateISO)),
-      }));
-  }, [visibleEntries]);
+    return map;
+  }, [yearEntries]);
 
-  if (years.length === 0) {
-    return (
-      <div className="sched-cal-empty">
-        <CalendarDays size={32} aria-hidden="true" />
-        <p>Jelenleg nincs meghirdetett indulási időpont.</p>
-      </div>
-    );
-  }
+  const detailEntries = useMemo(() => {
+    if (selectedISO) {
+      return (byDate.get(selectedISO) ?? []).slice();
+    }
+    return yearEntries
+      .filter((e) => !e.isPast)
+      .sort((a, b) => a.dateISO.localeCompare(b.dateISO))
+      .slice(0, 3);
+  }, [byDate, selectedISO, yearEntries]);
+
+  const detailTitle = selectedISO
+    ? formatDayHu(selectedISO)
+    : 'Következő indulások';
 
   return (
-    <div className="sched-cal">
-      {/* Eszköztár: év tabok + lejárt kapcsoló */}
-      <div className="sched-cal-toolbar">
-        <div className="sched-cal-years" role="tablist" aria-label="Év választása">
+    <div className="cal2">
+      <div className="cal2-toolbar">
+        <div className="cal2-years" role="tablist" aria-label="Év">
           {years.map((y) => (
             <button
               key={y}
-              role="tab"
-              aria-selected={y === year}
-              className={`sched-cal-year ${y === year ? 'is-active' : ''}`}
-              onClick={() => setYear(y)}
               type="button"
+              role="tab"
+              aria-selected={y === yearStr}
+              className={`cal2-year ${y === yearStr ? 'is-active' : ''}`}
+              onClick={() => {
+                setYearStr(y);
+                setSelectedISO(null);
+              }}
             >
               {y}
             </button>
           ))}
         </div>
-        {pastCount > 0 && (
-          <label className="sched-cal-toggle">
-            <input
-              type="checkbox"
-              checked={showPast}
-              onChange={(e) => setShowPast(e.target.checked)}
-            />
-            <span>Lejárt időpontok mutatása ({pastCount})</span>
-          </label>
-        )}
+        <div className="cal2-legend" aria-hidden="true">
+          <span className="cal2-legend-item">
+            <span className="cal2-dot is-ok" />
+            Szabad
+          </span>
+          <span className="cal2-legend-item">
+            <span className="cal2-dot is-few" />
+            Kevés
+          </span>
+          <span className="cal2-legend-item">
+            <span className="cal2-dot is-full" />
+            Betelt
+          </span>
+          <span className="cal2-legend-sep" />
+          <span className="cal2-legend-item">
+            <Plane size={14} />
+            Repülő
+          </span>
+          <span className="cal2-legend-item">
+            <Bus size={14} />
+            Busz
+          </span>
+        </div>
       </div>
 
-      {/* Összefoglaló sáv */}
-      <div className="sched-cal-summary">
-        <CalendarCheck size={18} aria-hidden="true" />
+      <div className="cal2-summary">
+        <CalendarDays size={18} />
         <span>
-          <strong>{year}</strong> — {upcomingCount}{' '}
-          {upcomingCount === 1 ? 'elérhető időpont' : 'elérhető időpont'}
-          {showPast && pastCount > 0 ? ` + ${pastCount} lejárt` : ''}
+          <strong>{yearStr}</strong> — {upcomingCount} elérhető indulás
         </span>
       </div>
 
-      {/* Hónapok */}
-      {months.length === 0 ? (
-        <div className="sched-cal-empty">
-          <CalendarDays size={32} aria-hidden="true" />
-          <p>
-            Nincs {showPast ? '' : 'elérhető '}időpont {year}-ben.
-          </p>
-        </div>
-      ) : (
-        <div className="sched-cal-months">
-          {months.map((m) => (
-            <section key={m.idx} className="sched-cal-month">
-              <header className="sched-cal-month-head">
-                <span className="sched-cal-month-name">{m.name}</span>
-                <span className="sched-cal-month-count">
-                  {m.entries.length}{' '}
-                  {m.entries.length === 1 ? 'időpont' : 'időpont'}
-                </span>
-              </header>
-              <ul className="sched-cal-list">
-                {m.entries.map((e) => (
-                  <ScheduleRow key={e.id} entry={e} />
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
-      )}
+      <div className="cal2-grid">
+        {Array.from({ length: 12 }, (_, m) => (
+          <MiniMonth
+            key={m}
+            year={year}
+            monthIdx={m}
+            byDate={byDate}
+            todayISO={todayStr}
+            selectedISO={selectedISO}
+            onSelect={setSelectedISO}
+          />
+        ))}
+      </div>
+
+      <DetailPanel
+        title={detailTitle}
+        entries={detailEntries}
+        clearable={!!selectedISO}
+        onClear={() => setSelectedISO(null)}
+      />
     </div>
   );
 }
 
-function ScheduleRow({ entry }: { entry: ScheduleEntry }) {
-  const endLabel = computeEndLabel(entry);
-  const isFull = entry.status === 'full';
+function MiniMonth({
+  year,
+  monthIdx,
+  byDate,
+  todayISO,
+  selectedISO,
+  onSelect,
+}: {
+  year: number;
+  monthIdx: number;
+  byDate: Map<string, ScheduleEntry[]>;
+  todayISO: string;
+  selectedISO: string | null;
+  onSelect: (iso: string | null) => void;
+}) {
+  const total = daysInMonth(year, monthIdx);
+  const lead = firstWeekdayMon(year, monthIdx);
+  const cells: Array<number | null> = [];
+  for (let i = 0; i < lead; i++) cells.push(null);
+  for (let d = 1; d <= total; d++) cells.push(d);
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  let monthCount = 0;
+  for (let d = 1; d <= total; d++) {
+    monthCount += byDate.get(isoFor(year, monthIdx, d))?.length ?? 0;
+  }
+  const isEmpty = monthCount === 0;
 
   return (
-    <li
-      className={`sched-cal-row status-${entry.status}${entry.isPast ? ' is-past' : ''}`}
-    >
-      <div className="sched-cal-day" aria-hidden="true">
-        <span className="sched-cal-day-num">{entry.day}</span>
-        {endLabel && <span className="sched-cal-day-end">{endLabel}</span>}
-      </div>
-      <div className="sched-cal-main">
-        <Link
-          href={`/uticelok/${entry.destinationSlug}`}
-          className="sched-cal-title"
-        >
-          {entry.destinationTitle}
-        </Link>
-        <div className="sched-cal-meta">
-          <span>
-            <MapPin size={13} aria-hidden="true" />
-            {entry.region}
-          </span>
-          <span>
-            <CalendarDays size={13} aria-hidden="true" />
-            {entry.dateLabel}
-          </span>
-          {entry.durationDays && (
-            <span>
-              <Clock size={13} aria-hidden="true" />
-              {entry.durationDays} nap
-            </span>
-          )}
-        </div>
-        {entry.note && <p className="sched-cal-note">{entry.note}</p>}
-      </div>
-      <div className="sched-cal-status">
-        <StatusPill status={entry.status} isPast={entry.isPast} />
-      </div>
-      <div className="sched-cal-cta">
-        {entry.isPast ? (
-          <span className="sched-cal-disabled">Lejárt</span>
-        ) : isFull ? (
-          <span className="sched-cal-disabled">Betelt</span>
-        ) : (
-          <Link
-            href={`/jelentkezes?utazas=${entry.id}`}
-            className="btn-accent sched-cal-book"
-            aria-label={`Foglalás: ${entry.destinationTitle}, ${entry.dateLabel}`}
-          >
-            Foglalás
-            <ArrowRight size={14} aria-hidden="true" />
-          </Link>
+    <section className={`cal2-month ${isEmpty ? 'is-empty' : ''}`}>
+      <header className="cal2-month-head">
+        <span className="cal2-month-name">{MONTHS_HU[monthIdx]}</span>
+        {monthCount > 0 && (
+          <span className="cal2-month-count">{monthCount}</span>
         )}
+      </header>
+      <div className="cal2-dow" aria-hidden="true">
+        {DOW_HU.map((d) => (
+          <span key={d}>{d}</span>
+        ))}
       </div>
-    </li>
+      <div className="cal2-cells">
+        {cells.map((d, i) => {
+          if (d === null) return <span key={i} className="cal2-cell is-blank" />;
+          const iso = isoFor(year, monthIdx, d);
+          const list = byDate.get(iso);
+          const has = !!list && list.length > 0;
+          const isPast = iso < todayISO;
+          const isToday = iso === todayISO;
+          const isSelected = iso === selectedISO;
+
+          if (!has) {
+            return (
+              <span
+                key={i}
+                className={`cal2-cell ${isToday ? 'is-today' : ''} ${isPast ? 'is-past' : ''}`}
+              >
+                {d}
+              </span>
+            );
+          }
+          const status = bestStatus(list!);
+          const transport = detectTransport(list![0]);
+          return (
+            <button
+              key={i}
+              type="button"
+              className={`cal2-cell has-event status-${status} ${isPast ? 'is-past' : ''} ${isToday ? 'is-today' : ''} ${isSelected ? 'is-selected' : ''}`}
+              onClick={() => onSelect(isSelected ? null : iso)}
+              aria-label={`${d}. – ${list!.length} indulás`}
+              aria-pressed={isSelected}
+            >
+              <span className="cal2-cell-num">{d}</span>
+              <span className="cal2-cell-icon">
+                <TransportIcon mode={transport} size={11} />
+              </span>
+              {list!.length > 1 && (
+                <span className="cal2-cell-badge">{list!.length}</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
-function computeEndLabel(e: ScheduleEntry): string | null {
-  if (!e.durationDays || e.durationDays <= 1) return null;
-  const start = new Date(e.dateISO);
-  if (Number.isNaN(start.getTime())) return null;
-  const end = new Date(start);
-  end.setDate(end.getDate() + e.durationDays - 1);
-  // Csak hónap-nap, ugyanazon hónapon belül csak a napot
-  const sameMonth = end.getMonth() === start.getMonth();
-  const day = String(end.getDate()).padStart(2, '0');
-  if (sameMonth) return `– ${day}.`;
-  const m = MONTHS_HU[end.getMonth()].slice(0, 3).toLowerCase();
-  return `– ${m} ${day}.`;
+function DetailPanel({
+  title,
+  entries,
+  clearable,
+  onClear,
+}: {
+  title: string;
+  entries: ScheduleEntry[];
+  clearable: boolean;
+  onClear: () => void;
+}) {
+  return (
+    <div className="cal2-panel" aria-live="polite">
+      <header className="cal2-panel-head">
+        <h3>{title}</h3>
+        {clearable && (
+          <button
+            type="button"
+            className="cal2-panel-close"
+            onClick={onClear}
+            aria-label="Kijelölés törlése"
+          >
+            <X size={16} />
+          </button>
+        )}
+      </header>
+      {entries.length === 0 ? (
+        <div className="cal2-panel-empty">
+          Nincs erre a napra meghirdetett indulás.
+        </div>
+      ) : (
+        <ul className="cal2-panel-list">
+          {entries.map((e) => {
+            const transport = detectTransport(e);
+            const isFull = e.status === 'full';
+            return (
+              <li
+                key={e.id}
+                className={`cal2-panel-item status-${e.status} ${e.isPast ? 'is-past' : ''}`}
+              >
+                <div className="cal2-panel-icon">
+                  <TransportIcon mode={transport} size={22} />
+                </div>
+                <div className="cal2-panel-body">
+                  <Link
+                    href={`/uticelok/${e.destinationSlug}`}
+                    className="cal2-panel-title"
+                  >
+                    {e.destinationTitle}
+                  </Link>
+                  <div className="cal2-panel-meta">
+                    <span>
+                      <CalendarDays size={13} />
+                      {e.dateLabel}
+                    </span>
+                    <span>
+                      <MapPin size={13} />
+                      {e.region}
+                    </span>
+                    {e.durationDays && (
+                      <span>
+                        <Clock size={13} />
+                        {e.durationDays} nap
+                      </span>
+                    )}
+                  </div>
+                  {e.note && <p className="cal2-panel-note">{e.note}</p>}
+                </div>
+                <div className="cal2-panel-cta">
+                  <StatusPill status={e.status} isPast={e.isPast} />
+                  {e.isPast ? (
+                    <span className="cal2-panel-disabled">Lejárt</span>
+                  ) : isFull ? (
+                    <span className="cal2-panel-disabled">Betelt</span>
+                  ) : (
+                    <Link
+                      href={`/jelentkezes?utazas=${e.id}`}
+                      className="btn-accent cal2-panel-book"
+                    >
+                      Foglalás
+                      <ArrowRight size={14} />
+                    </Link>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
 }
 
 function StatusPill({
@@ -261,14 +420,8 @@ function StatusPill({
   status: ScheduleEntry['status'];
   isPast: boolean;
 }) {
-  if (isPast) {
-    return <span className="sched-cal-pill is-past">Lejárt</span>;
-  }
-  if (status === 'full') {
-    return <span className="sched-cal-pill is-full">Betelt</span>;
-  }
-  if (status === 'few') {
-    return <span className="sched-cal-pill is-few">Kevés hely</span>;
-  }
-  return <span className="sched-cal-pill is-ok">Szabad helyek</span>;
+  if (isPast) return <span className="cal2-pill is-past">Lejárt</span>;
+  if (status === 'full') return <span className="cal2-pill is-full">Betelt</span>;
+  if (status === 'few') return <span className="cal2-pill is-few">Kevés hely</span>;
+  return <span className="cal2-pill is-ok">Szabad helyek</span>;
 }
