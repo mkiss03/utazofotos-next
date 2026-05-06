@@ -99,6 +99,54 @@ export async function uploadMedia(
   return { ok: true, uploaded: uploadedCount };
 }
 
+export type CropUploadResult =
+  | { ok: true; url: string; alt: string }
+  | { ok: false; error: string };
+
+/**
+ * Egyetlen, kliensen vágott / méretezett kép feltöltése.
+ * Visszaadja a publikus URL-t, hogy az űrlap azonnal beállíthassa.
+ */
+export async function uploadCroppedImage(
+  formData: FormData,
+): Promise<CropUploadResult> {
+  const session = await requireAdmin();
+  const file = formData.get('file');
+  const alt = String(formData.get('alt') ?? '').trim().slice(0, 200);
+
+  if (!(file instanceof File)) {
+    return { ok: false, error: 'Hiányzó fájl.' };
+  }
+  if (!ALLOWED_MIME.has(file.type)) {
+    return { ok: false, error: `Nem támogatott típus: ${file.type}.` };
+  }
+  if (file.size > MAX_BYTES) {
+    return {
+      ok: false,
+      error: `Túl nagy fájl (${(file.size / 1024 / 1024).toFixed(1)} MB). Max 10 MB.`,
+    };
+  }
+
+  const filename = file.name && file.name.length > 0 ? file.name : 'crop.jpg';
+  const pathname = buildMediaPathname(filename);
+  const buf = Buffer.from(await file.arrayBuffer());
+  await uploadToStorage(pathname, buf, file.type);
+  const url = getPublicUrl(pathname);
+
+  await db.insert(media).values({
+    url,
+    pathname,
+    filename: filename.slice(0, 255),
+    mimeType: file.type,
+    sizeBytes: file.size,
+    alt,
+    uploadedById: (session.user as { id?: string }).id ?? null,
+  });
+
+  revalidatePath('/admin/media');
+  return { ok: true, url, alt };
+}
+
 const altSchema = z.object({
   id: z.string().uuid(),
   alt: z.string().trim().max(200),

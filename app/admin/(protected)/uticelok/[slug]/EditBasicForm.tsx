@@ -3,10 +3,11 @@
 import { useEffect, useState, useTransition, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Save, Loader2, Eye, EyeOff, ImageOff, Wand2, Trash2 } from 'lucide-react';
+import { Save, Loader2, Eye, EyeOff, ImageOff, Wand2, Trash2, Crop } from 'lucide-react';
 import { updateDestinationBasic, type UpdateBasicState } from './actions';
 import { slugify } from '@/lib/slug';
 import { MediaPicker } from '@/components/admin/MediaPicker';
+import { ImageEditorModal } from '@/components/admin/ImageEditorModal';
 
 type DestProps = {
   id: string;
@@ -38,6 +39,7 @@ export function EditBasicForm({ destination }: { destination: DestProps }) {
   const [coverImageAlt, setCoverImageAlt] = useState(destination.coverImageAlt ?? '');
   const [sortOrder, setSortOrder] = useState<number>(destination.sortOrder);
   const [published, setPublished] = useState<boolean>(destination.published);
+  const [imageEditorOpen, setImageEditorOpen] = useState(false);
 
   // Sikeres mentés után — ha változott a slug, navigáljunk az új URL-re.
   useEffect(() => {
@@ -209,6 +211,17 @@ export function EditBasicForm({ destination }: { destination: DestProps }) {
                 <button
                   type="button"
                   className="admin-btn admin-btn-secondary"
+                  onClick={() => setImageEditorOpen(true)}
+                  title="Kép szélességének / kivágásának / nagyításának állítása"
+                >
+                  <Crop size={14} aria-hidden="true" />
+                  <span>Szerkesztés</span>
+                </button>
+              )}
+              {coverImageUrl && (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-secondary"
                   onClick={() => setCoverImageUrl('')}
                   title="Kép eltávolítása"
                 >
@@ -314,6 +327,18 @@ export function EditBasicForm({ destination }: { destination: DestProps }) {
           )}
         </button>
       </div>
+      {imageEditorOpen && coverImageUrl && (
+        <ImageEditorModal
+          sourceUrl={coverImageUrl}
+          initialAlt={coverImageAlt}
+          onClose={() => setImageEditorOpen(false)}
+          onSaved={(newUrl, alt) => {
+            setCoverImageUrl(newUrl);
+            if (alt && !coverImageAlt) setCoverImageAlt(alt);
+            setImageEditorOpen(false);
+          }}
+        />
+      )}
     </form>
   );
 }
