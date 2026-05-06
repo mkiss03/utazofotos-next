@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   Plane,
@@ -105,6 +105,105 @@ function bestStatus(list: ScheduleEntry[]): 'available' | 'few' | 'full' {
   return 'full';
 }
 
+function DayModal({
+  title,
+  entries,
+  onClose,
+}: {
+  title: string;
+  entries: ScheduleEntry[];
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="cal2-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      onClick={onClose}
+    >
+      <div className="cal2-modal" onClick={(e) => e.stopPropagation()}>
+        <header className="cal2-modal-head">
+          <h3>{title}</h3>
+          <button
+            type="button"
+            className="cal2-modal-close"
+            onClick={onClose}
+            aria-label="Bezárás"
+          >
+            <X size={20} />
+          </button>
+        </header>
+        <div className="cal2-modal-body">
+          {entries.length === 0 ? (
+            <div className="cal2-panel-empty">
+              Nincs erre a napra meghirdetett indulás.
+            </div>
+          ) : (
+            <ul className="cal2-panel-list cal2-modal-list">
+              {entries.map((e) => {
+                const transport = detectTransport(e);
+                const isFull = e.status === 'full';
+                return (
+                  <li
+                    key={e.id}
+                    className={`cal2-panel-item status-${e.status} ${e.isPast ? 'is-past' : ''}`}
+                  >
+                    <div className="cal2-panel-icon cal2-panel-icon-lg">
+                      <TransportIcon mode={transport} size={28} />
+                    </div>
+                    <div className="cal2-panel-body">
+                      <Link
+                        href={`/uticelok/${e.destinationSlug}`}
+                        className="cal2-panel-title"
+                      >
+                        {e.destinationTitle}
+                      </Link>
+                      <div className="cal2-panel-meta">
+                        <span>
+                          <CalendarDays size={14} />
+                          {e.dateLabel}
+                        </span>
+                        <span>
+                          <MapPin size={14} />
+                          {e.region}
+                        </span>
+                        {e.durationDays && (
+                          <span>
+                            <Clock size={14} />
+                            {e.durationDays} nap
+                          </span>
+                        )}
+                      </div>
+                      {e.note && <p className="cal2-panel-note">{e.note}</p>}
+                    </div>
+                    <div className="cal2-panel-cta">
+                      <StatusPill status={e.status} isPast={e.isPast} />
+                      {e.isPast ? (
+                        <span className="cal2-panel-disabled">Lejárt</span>
+                      ) : isFull ? (
+                        <span className="cal2-panel-disabled">Betelt</span>
+                      ) : (
+                        <Link
+                          href={`/jelentkezes?utazas=${e.id}`}
+                          className="btn-accent cal2-panel-book"
+                        >
+                          Foglalás
+                          <ArrowRight size={14} />
+                        </Link>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ScheduleCalendar({ entries }: Props) {
   const years = useMemo(() => {
     const set = new Set(entries.map((e) => e.dateISO.slice(0, 4)));
@@ -144,18 +243,34 @@ export function ScheduleCalendar({ entries }: Props) {
   }, [yearEntries]);
 
   const detailEntries = useMemo(() => {
-    if (selectedISO) {
-      return (byDate.get(selectedISO) ?? []).slice();
-    }
-    return yearEntries
-      .filter((e) => !e.isPast)
-      .sort((a, b) => a.dateISO.localeCompare(b.dateISO))
-      .slice(0, 3);
-  }, [byDate, selectedISO, yearEntries]);
+    if (!selectedISO) return [];
+    return (byDate.get(selectedISO) ?? []).slice();
+  }, [byDate, selectedISO]);
 
-  const detailTitle = selectedISO
-    ? formatDayHu(selectedISO)
-    : 'Következő indulások';
+  const upcomingTop = useMemo(
+    () =>
+      yearEntries
+        .filter((e) => !e.isPast)
+        .sort((a, b) => a.dateISO.localeCompare(b.dateISO))
+        .slice(0, 3),
+    [yearEntries],
+  );
+
+  // Esc bezárás
+  useEffect(() => {
+    if (!selectedISO) return;
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') setSelectedISO(null);
+    };
+    window.addEventListener('keydown', onKey);
+    // body scroll lock
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [selectedISO]);
 
   return (
     <div className="cal2">
@@ -224,11 +339,19 @@ export function ScheduleCalendar({ entries }: Props) {
       </div>
 
       <DetailPanel
-        title={detailTitle}
-        entries={detailEntries}
-        clearable={!!selectedISO}
-        onClear={() => setSelectedISO(null)}
+        title="Következő indulások"
+        entries={upcomingTop}
+        clearable={false}
+        onClear={() => {}}
       />
+
+      {selectedISO && (
+        <DayModal
+          title={formatDayHu(selectedISO)}
+          entries={detailEntries}
+          onClose={() => setSelectedISO(null)}
+        />
+      )}
     </div>
   );
 }

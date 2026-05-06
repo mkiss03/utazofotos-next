@@ -2846,3 +2846,105 @@ button.cal2-cell.has-event.is-selected {
   .cal2-years { justify-content: center; }
   .cal2-legend { justify-content: center; }
 }
+
+/* =============================================
+   CAL2 — nagyobb naptár cellák + modal
+   ============================================= */
+
+/* Nagyobb cellák */
+.cal2-cell {
+  min-height: 56px;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+.cal2-cells { gap: 6px; }
+.cal2-month { padding: 18px 16px 16px; }
+.cal2-month-name { font-size: 1.3rem; }
+.cal2-dow span { font-size: .72rem; }
+
+button.cal2-cell.has-event { gap: 3px; }
+.cal2-cell-num { font-size: 1.05rem; font-weight: 800; }
+.cal2-cell-icon svg { width: 16px; height: 16px; }
+.cal2-cell-badge {
+  min-width: 18px; height: 18px; font-size: .68rem;
+  top: 3px; right: 3px;
+}
+
+/* Hover-en kicsit erősebb feedback */
+button.cal2-cell.has-event:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 8px 18px rgba(0,0,0,.22);
+}
+
+@media (max-width: 600px) {
+  .cal2-cell { min-height: 48px; font-size: .95rem; }
+  .cal2-cell-num { font-size: 1rem; }
+  .cal2-cell-icon svg { width: 14px; height: 14px; }
+}
+
+/* ===== Modal ===== */
+.cal2-modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, .55);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: cal2-fade .18s ease;
+}
+@keyframes cal2-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.cal2-modal {
+  background: var(--white);
+  border-radius: 18px;
+  width: 100%;
+  max-width: 640px;
+  max-height: calc(100vh - 48px);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,.35);
+  animation: cal2-pop .22s ease;
+}
+@keyframes cal2-pop {
+  from { opacity: 0; transform: translateY(12px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cal2-modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px;
+  background: linear-gradient(to right, var(--accent-soft) 0%, transparent 70%);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cal2-modal-head h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cal2-modal-close {
+  appearance: none; border: 0; background: var(--light);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  color: var(--ink); cursor: pointer; transition: var(--trans);
+  flex-shrink: 0;
+}
+.cal2-modal-close:hover { background: var(--accent); color: var(--white); }
+
+.cal2-modal-body { overflow-y: auto; flex: 1; }
+.cal2-modal-list .cal2-panel-item { padding: 18px 22px; }
+
+.cal2-panel-icon-lg { width: 56px; height: 56px; }
+
+@media (max-width: 600px) {
+  .cal2-modal-backdrop { padding: 12px; align-items: flex-end; }
+  .cal2-modal {
+    border-radius: 18px 18px 0 0;
+    max-height: 86vh;
+  }
+  .cal2-modal-head { padding: 16px 18px; }
+  .cal2-modal-head h3 { font-size: 1.15rem; }
+  .cal2-panel-icon-lg { width: 44px; height: 44px; }
+}
