@@ -4,7 +4,9 @@ import { ArrowRight } from 'lucide-react';
 import { DestinationCard } from '@/components/DestinationCard';
 import { FBanner, Footer } from '@/components/Footer';
 import { EditableRegion } from '@/components/admin/EditableRegion';
+import { EditableLinkRegion } from '@/components/admin/EditableLinkRegion';
 import { HeroEditor } from '@/app/admin/(protected)/oldalak/HeroEditor';
+import { TestimonialsEditor } from '@/app/admin/(protected)/oldalak/TestimonialsEditor';
 import { TestimonialsGallery } from '@/components/TestimonialsGallery';
 import { getAllDestinations } from '@/lib/data/destinations';
 import { sortByNextDeparture } from '@/lib/destinations';
@@ -48,31 +50,47 @@ export default async function HomePage() {
         </div>
       </EditableRegion>
 
-      <div className="section-head">
-        <h2>Közelgő úticélok</h2>
-        <p style={{ marginTop: 8, color: 'var(--mid)', fontSize: '1.05rem' }}>
-          Válassz úticélt, és nézd meg a meghirdetett indulási időpontokat.
-        </p>
-      </div>
-
-      <div className="dest-list-wrap" style={{ paddingTop: 8 }}>
-        <div className="dest-list">
-          {upcoming.map((d) => (
-            <DestinationCard key={d.slug} destination={d} />
-          ))}
+      <EditableLinkRegion
+        label="Úticélok kezelése"
+        href="/admin/uticelok"
+      >
+        <div className="section-head">
+          <h2>Közelgő úticélok</h2>
+          <p style={{ marginTop: 8, color: 'var(--mid)', fontSize: '1.05rem' }}>
+            Válassz úticélt, és nézd meg a meghirdetett indulási időpontokat.
+          </p>
         </div>
-        <div style={{ textAlign: 'center', marginTop: 40 }}>
-          <Link href="/uticelok" className="btn-outline-dark btn-large">
-            Az összes úticél megtekintése
-            <ArrowRight size={16} aria-hidden="true" />
-          </Link>
+
+        <div className="dest-list-wrap" style={{ paddingTop: 8 }}>
+          <div className="dest-list">
+            {upcoming.map((d) => (
+              <DestinationCard key={d.slug} destination={d} />
+            ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <Link href="/uticelok" className="btn-outline-dark btn-large">
+              Az összes úticél megtekintése
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
+          </div>
         </div>
-      </div>
+      </EditableLinkRegion>
 
-      <TestimonialsGallery data={testimonials} />
+      <EditableRegion
+        label="Vélemények és galéria szerkesztése"
+        modalTitle="Kezdőlap — Vélemények és galéria"
+        editor={<TestimonialsEditor initial={testimonials} />}
+      >
+        <TestimonialsGallery data={testimonials} />
+      </EditableRegion>
 
-      <FBanner />
-      <Footer />
+      <EditableLinkRegion
+        label="Kapcsolat / Beállítások"
+        href="/admin/beallitasok"
+      >
+        <FBanner />
+        <Footer />
+      </EditableLinkRegion>
     </>
   );
 }

@@ -3337,3 +3337,105 @@ button.cal2-cell.has-event:hover {
   .admin-test-grid { grid-template-columns: 1fr; }
   .admin-test-fields { grid-template-columns: 1fr; }
 }
+
+
+/* ============================================================
+   ADMIN BAR (publikus oldalon, csak admin nĂ©zĹ‘nek)
+   ============================================================ */
+.adminbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: #1f2937;
+  color: #f3f4f6;
+  font-size: 13px;
+  line-height: 1;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+}
+.adminbar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #f3f4f6;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.adminbar-link:hover { background: rgba(255,255,255,.10); }
+.adminbar-brand { font-weight: 600; color: #fbbf24; }
+.adminbar-brand:hover { color: #fcd34d; }
+.adminbar-link-soft { color: #d1d5db; }
+.adminbar-link-out { color: #fca5a5; }
+.adminbar-link-out:hover { background: rgba(248,113,113,.18); color: #fff; }
+.adminbar-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(255,255,255,.18);
+  margin: 0 6px;
+}
+.adminbar-spacer { flex: 1 1 auto; min-width: 8px; }
+
+@media (max-width: 720px) {
+  .adminbar { font-size: 12px; padding: 4px 6px; }
+  .adminbar-link { padding: 5px 7px; }
+  .adminbar-link span { display: none; }
+  .adminbar-brand span { display: inline; }
+}
+
+/* ============================================================
+   MEDIA TILE â€” hover tĂ¶rlĂ©s gomb
+   ============================================================ */
+.admin-media-tile-wrap {
+  position: relative;
+}
+.admin-media-tile-del {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: rgba(220, 38, 38, .92);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity .15s, transform .15s, background .15s;
+  box-shadow: 0 4px 12px -4px rgba(0,0,0,.4);
+  font: inherit;
+  font-size: 12px;
+  z-index: 2;
+}
+.admin-media-tile-wrap:hover .admin-media-tile-del,
+.admin-media-tile-wrap:focus-within .admin-media-tile-del,
+.admin-media-tile-del.is-confirming {
+  opacity: 1;
+  transform: translateY(0);
+}
+.admin-media-tile-del:hover { background: rgba(185, 28, 28, 1); }
+.admin-media-tile-del.is-confirming {
+  background: #b91c1c;
+  animation: admin-pulse 1.2s ease-in-out infinite;
+}
+@keyframes admin-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,.45); }
+  50%      { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
+}
+.admin-media-tile-del-confirm {
+  font-weight: 600;
+}

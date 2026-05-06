@@ -116,32 +116,7 @@ export function MediaLibrary({ items }: { items: MediaItem[] }) {
       ) : (
         <div className="admin-media-grid">
           {items.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              className="admin-media-tile"
-              onClick={() => setSelected(m)}
-              aria-label={`Kép: ${m.filename}`}
-            >
-              <div className="admin-media-thumb">
-                <Image
-                  src={m.url}
-                  alt={m.alt || m.filename}
-                  fill
-                  sizes="200px"
-                  style={{ objectFit: 'cover' }}
-                  unoptimized
-                />
-              </div>
-              <div className="admin-media-tile-meta">
-                <span className="admin-media-tile-name" title={m.filename}>
-                  {m.filename}
-                </span>
-                <span className="admin-media-tile-size">
-                  {formatSize(m.sizeBytes)}
-                </span>
-              </div>
-            </button>
+            <MediaTile key={m.id} item={m} onOpen={() => setSelected(m)} />
           ))}
         </div>
       )}
@@ -153,6 +128,74 @@ export function MediaLibrary({ items }: { items: MediaItem[] }) {
           onDeleted={() => setSelected(null)}
         />
       )}
+    </div>
+  );
+}
+
+function MediaTile({
+  item,
+  onOpen,
+}: {
+  item: MediaItem;
+  onOpen: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [confirming, setConfirming] = useState(false);
+
+  function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!confirming) {
+      setConfirming(true);
+      setTimeout(() => setConfirming(false), 3500);
+      return;
+    }
+    startTransition(async () => {
+      await deleteMedia(item.id);
+    });
+  }
+
+  return (
+    <div className="admin-media-tile-wrap">
+      <button
+        type="button"
+        className="admin-media-tile"
+        onClick={onOpen}
+        aria-label={`Kép: ${item.filename}`}
+      >
+        <div className="admin-media-thumb">
+          <Image
+            src={item.url}
+            alt={item.alt || item.filename}
+            fill
+            sizes="200px"
+            style={{ objectFit: 'cover' }}
+            unoptimized
+          />
+        </div>
+        <div className="admin-media-tile-meta">
+          <span className="admin-media-tile-name" title={item.filename}>
+            {item.filename}
+          </span>
+          <span className="admin-media-tile-size">
+            {formatSize(item.sizeBytes)}
+          </span>
+        </div>
+      </button>
+      <button
+        type="button"
+        className={`admin-media-tile-del${confirming ? ' is-confirming' : ''}`}
+        onClick={handleDelete}
+        disabled={isPending}
+        title={confirming ? 'Kattints újra a végleges törléshez' : 'Kép törlése'}
+        aria-label="Kép törlése"
+      >
+        {isPending ? (
+          <Loader2 size={14} className="admin-spin" aria-hidden="true" />
+        ) : (
+          <Trash2 size={14} aria-hidden="true" />
+        )}
+        {confirming && <span className="admin-media-tile-del-confirm">Megerősít</span>}
+      </button>
     </div>
   );
 }
