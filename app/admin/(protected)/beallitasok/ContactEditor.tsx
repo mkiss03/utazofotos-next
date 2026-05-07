@@ -14,6 +14,8 @@ export function ContactEditor({ initial: data }: { initial: ContactContent }) {
   const [email, setEmail] = useState(data.email);
   const [facebookUrl, setFacebookUrl] = useState(data.facebookUrl);
   const [facebookLabel, setFacebookLabel] = useState(data.facebookLabel);
+  const [instagramUrl, setInstagramUrl] = useState(data.instagramUrl ?? '');
+  const [instagramLabel, setInstagramLabel] = useState(data.instagramLabel ?? '@utazofotos');
 
   function submit(fd: FormData) {
     startTransition(() => action(fd));
@@ -52,16 +54,44 @@ export function ContactEditor({ initial: data }: { initial: ContactContent }) {
           value={facebookUrl}
           onChange={(e) => setFacebookUrl(e.target.value)}
           required
+          placeholder="https://www.facebook.com/groups/..."
         />
       </div>
       <div className="admin-field admin-field-wide">
-        <label htmlFor="ct-fb-label">Facebook csoport megnevezése</label>
+        <label htmlFor="ct-fb-label">Facebook megnevezése (megjelenő szöveg)</label>
         <input
           id="ct-fb-label"
           name="facebookLabel"
           type="text"
           value={facebookLabel}
           onChange={(e) => setFacebookLabel(e.target.value)}
+        />
+      </div>
+      <div className="admin-field admin-field-wide">
+        <label htmlFor="ct-ig-url">
+          Instagram URL{' '}
+          <span className="admin-field-hint" style={{ display: 'inline', marginLeft: 6 }}>
+            (hagyd üresen, ha még nincs Instagram fiók — nem jelenik meg az oldalon)
+          </span>
+        </label>
+        <input
+          id="ct-ig-url"
+          name="instagramUrl"
+          type="url"
+          value={instagramUrl}
+          onChange={(e) => setInstagramUrl(e.target.value)}
+          placeholder="https://www.instagram.com/utazofotos"
+        />
+      </div>
+      <div className="admin-field admin-field-wide">
+        <label htmlFor="ct-ig-label">Instagram megnevezése (megjelenő szöveg)</label>
+        <input
+          id="ct-ig-label"
+          name="instagramLabel"
+          type="text"
+          value={instagramLabel}
+          onChange={(e) => setInstagramLabel(e.target.value)}
+          placeholder="@utazofotos"
         />
       </div>
 

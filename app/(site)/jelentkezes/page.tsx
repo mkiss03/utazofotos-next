@@ -50,7 +50,7 @@ export default async function JelentkezesPage() {
           <BookingFormWrapper allDestinations={allDestinations} />
         </Suspense>
       </div>
-      <Footer withFb={false} />
+      <Footer withSocial={false} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { Phone, Mail, Facebook } from 'lucide-react';
+import { Phone, Mail, Facebook, Instagram } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { ContactForm } from '@/components/ContactForm';
 import { EditableRegion } from '@/components/admin/EditableRegion';
@@ -79,6 +79,22 @@ export default async function KapcsolatPage() {
               {contact.facebookLabel}
             </a>
           </div>
+          {contact.instagramUrl && (
+            <div className="c-row">
+              <span className="c-lbl">
+                <Instagram size={12} aria-hidden="true" />
+                Instagram
+              </span>
+              <a
+                className="c-val"
+                href={contact.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {contact.instagramLabel || contact.instagramUrl}
+              </a>
+            </div>
+          )}
           <a
             className="btn-outline-dark"
             style={{ marginTop: 18 }}
@@ -89,6 +105,18 @@ export default async function KapcsolatPage() {
             <Facebook size={14} aria-hidden="true" />
             Facebook csoport
           </a>
+          {contact.instagramUrl && (
+            <a
+              className="btn-outline-dark"
+              style={{ marginTop: 10 }}
+              href={contact.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Instagram size={14} aria-hidden="true" />
+              {contact.instagramLabel || 'Instagram'}
+            </a>
+          )}
           </div>
         </EditableRegion>
         <div>

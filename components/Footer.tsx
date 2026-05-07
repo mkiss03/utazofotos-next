@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import { Facebook } from 'lucide-react';
-import { FB_URL } from './TopBar';
+import { Facebook, Instagram } from 'lucide-react';
+import { getSiteContent } from '@/lib/site-content';
 
 export function FBanner() {
   return (
@@ -16,16 +16,27 @@ export function FBanner() {
   );
 }
 
-export function Footer({ withFb = true }: { withFb?: boolean }) {
+export async function Footer({ withSocial = true }: { withSocial?: boolean }) {
   const year = new Date().getFullYear();
+  const contact = withSocial ? await getSiteContent('contact') : null;
   return (
     <footer>
       <div className="f-copy">© {year} UtazóFotós | Minden jog fenntartva</div>
-      {withFb && (
-        <a className="f-fb" href={FB_URL} target="_blank" rel="noopener noreferrer">
-          <Facebook size={14} aria-hidden="true" />
-          facebook.com/groups/702270205143442
-        </a>
+      {withSocial && contact && (
+        <div className="f-social">
+          {contact.facebookUrl && (
+            <a className="f-fb" href={contact.facebookUrl} target="_blank" rel="noopener noreferrer">
+              <Facebook size={14} aria-hidden="true" />
+              {contact.facebookLabel || 'Facebook'}
+            </a>
+          )}
+          {contact.instagramUrl && (
+            <a className="f-ig" href={contact.instagramUrl} target="_blank" rel="noopener noreferrer">
+              <Instagram size={14} aria-hidden="true" />
+              {contact.instagramLabel || 'Instagram'}
+            </a>
+          )}
+        </div>
       )}
     </footer>
   );

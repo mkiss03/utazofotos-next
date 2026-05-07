@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Facebook } from 'lucide-react';
+import { Facebook, Instagram } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { EditableRegion } from '@/components/admin/EditableRegion';
 import { AboutEditor } from '@/app/admin/(protected)/oldalak/AboutEditor';
@@ -59,6 +59,17 @@ export default async function RolamPage() {
                 <Facebook size={14} aria-hidden="true" />
                 Facebook csoport
               </a>
+              {contact.instagramUrl && (
+                <a
+                  className="btn-outline-dark"
+                  href={contact.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Instagram size={14} aria-hidden="true" />
+                  {contact.instagramLabel || 'Instagram'}
+                </a>
+              )}
             </div>
           </div>
           <div className="about-content">

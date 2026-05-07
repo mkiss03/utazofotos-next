@@ -197,7 +197,7 @@ export default async function DestinationPage({
       </div>
 
       <FBanner />
-      <Footer withFb={false} />
+      <Footer withSocial={false} />
       {!isEmbed && (
         <AdminEditFab
           href={`/admin/uticelok/${dest.slug}`}

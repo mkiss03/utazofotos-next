@@ -58,6 +58,8 @@ export type ContactContent = {
   email: string;
   facebookUrl: string;
   facebookLabel: string;
+  instagramUrl: string;
+  instagramLabel: string;
 };
 
 export type SiteContentMap = {
@@ -143,8 +145,10 @@ export const DEFAULTS: SiteContentMap = {
     phone: '+36 30 247 3323',
     email: 'utazoelmenyfotos@gmail.com',
     facebookUrl:
-      'https://www.facebook.com/groups/utazofotos.napolyromatoszkana',
-    facebookLabel: 'Utazó fotós: Nápoly–Róma–Toszkána',
+      'https://www.facebook.com/groups/702270205143442',
+    facebookLabel: 'Utazó fotós Facebook csoport',
+    instagramUrl: '',
+    instagramLabel: '@utazofotos',
   },
 };
 

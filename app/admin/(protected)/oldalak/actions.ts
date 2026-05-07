@@ -156,6 +156,15 @@ const contactSchema = z.object({
   email: z.string().trim().email('Érvénytelen e-mail.').max(255),
   facebookUrl: z.string().trim().url('Érvénytelen URL.').max(500),
   facebookLabel: z.string().trim().max(120),
+  instagramUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .refine(
+      (v) => v === '' || /^https?:\/\//.test(v),
+      'Érvénytelen Instagram URL — https://... formátum szükséges.',
+    ),
+  instagramLabel: z.string().trim().max(120),
 });
 
 export async function saveContact(
@@ -168,6 +177,8 @@ export async function saveContact(
     email: formData.get('email'),
     facebookUrl: formData.get('facebookUrl'),
     facebookLabel: formData.get('facebookLabel'),
+    instagramUrl: formData.get('instagramUrl') ?? '',
+    instagramLabel: formData.get('instagramLabel') ?? '',
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? 'Hibás adatok.' };
