@@ -14,6 +14,9 @@ const links = [
   { href: '/kapcsolat', label: 'Kapcsolat' },
 ];
 
+const leftLinks = links.slice(0, 3);
+const rightLinks = links.slice(3);
+
 function isActive(pathname: string, href: string) {
   if (href === '/') return pathname === '/';
   return pathname === href || pathname.startsWith(href + '/');
@@ -40,6 +43,16 @@ export function Nav() {
     <>
       <nav className={`main-nav${scrolled ? ' scrolled' : ''}`}>
         <div className="nav-inner">
+          <ul className="nav-links nav-links-left">
+            {leftLinks.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className={isActive(pathname, l.href) ? 'active' : ''}>
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
           <Link href="/" className="nav-logo" aria-label="UtazóFotós kezdőlap">
             <Image
               src="/images/logo.png"
@@ -51,8 +64,8 @@ export function Nav() {
             />
           </Link>
 
-          <ul className="nav-links">
-            {links.map((l) => (
+          <ul className="nav-links nav-links-right">
+            {rightLinks.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className={isActive(pathname, l.href) ? 'active' : ''}>
                   {l.label}
