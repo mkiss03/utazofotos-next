@@ -43,13 +43,12 @@ export function Nav() {
           <Link href="/" className="nav-logo" aria-label="UtazóFotós kezdőlap">
             <Image
               src="/images/logo.png"
-              alt=""
-              width={92}
-              height={46}
+              alt="UtazóFotós"
+              width={88}
+              height={88}
               priority
-              style={{ height: 46, width: 'auto' }}
+              className="nav-logo-img"
             />
-            <span className="nav-logo-text">Utazó Fotós</span>
           </Link>
 
           <ul className="nav-links">
