@@ -28,9 +28,11 @@ export type GridDestination = {
 export function DestinationsGrid({
   items,
   isAdmin,
+  showToolbar = true,
 }: {
   items: GridDestination[];
   isAdmin: boolean;
+  showToolbar?: boolean;
 }) {
   const [region, setRegion] = useState<string>('all');
   const [query, setQuery] = useState('');
@@ -62,33 +64,35 @@ export function DestinationsGrid({
 
   return (
     <>
-      <div className="dest-grid-toolbar">
-        <div className="dest-grid-chips" role="tablist" aria-label="Szűrés régió szerint">
-          {regions.map((r) => (
-            <button
-              key={r}
-              type="button"
-              role="tab"
-              aria-selected={region === r}
-              className={`dest-grid-chip ${region === r ? 'is-active' : ''}`}
-              onClick={() => setRegion(r)}
-            >
-              {r === 'all' ? 'Mind' : r}
-              <span className="dest-grid-chip-count">{counts[r] ?? 0}</span>
-            </button>
-          ))}
-        </div>
+      {showToolbar && (
+        <div className="dest-grid-toolbar">
+          <div className="dest-grid-chips" role="tablist" aria-label="Szűrés régió szerint">
+            {regions.map((r) => (
+              <button
+                key={r}
+                type="button"
+                role="tab"
+                aria-selected={region === r}
+                className={`dest-grid-chip ${region === r ? 'is-active' : ''}`}
+                onClick={() => setRegion(r)}
+              >
+                {r === 'all' ? 'Mind' : r}
+                <span className="dest-grid-chip-count">{counts[r] ?? 0}</span>
+              </button>
+            ))}
+          </div>
 
-        <label className="dest-grid-search" aria-label="Keresés">
-          <Search size={16} aria-hidden="true" />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Keresés úticél vagy ország szerint…"
-          />
-        </label>
-      </div>
+          <label className="dest-grid-search" aria-label="Keresés">
+            <Search size={16} aria-hidden="true" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Keresés úticél vagy ország szerint…"
+            />
+          </label>
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div className="dest-grid-empty">

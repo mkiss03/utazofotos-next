@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { DestinationCard } from '@/components/DestinationCard';
+import { DestinationsGrid, type GridDestination } from '@/components/DestinationsGrid';
 import { FBanner, Footer } from '@/components/Footer';
 import { EditableRegion } from '@/components/admin/EditableRegion';
 import { EditableLinkRegion } from '@/components/admin/EditableLinkRegion';
@@ -9,8 +9,9 @@ import { HeroEditor } from '@/app/admin/(protected)/oldalak/HeroEditor';
 import { TestimonialsEditor } from '@/app/admin/(protected)/oldalak/TestimonialsEditor';
 import { TestimonialsGallery } from '@/components/TestimonialsGallery';
 import { getAllDestinations } from '@/lib/data/destinations';
-import { sortByNextDeparture } from '@/lib/destinations';
+import { sortByNextDeparture, getNextAnyDeparture } from '@/lib/destinations';
 import { getSiteContentMany } from '@/lib/site-content';
+import { isAdminViewer } from '@/lib/admin-viewer';
 
 // ISR: 60 másodpercenként újragenerálódik, ha az admin szerkesztett.
 export const revalidate = 60;
@@ -18,12 +19,33 @@ export const revalidate = 60;
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const [all, content] = await Promise.all([
+  const [all, content, isAdmin] = await Promise.all([
     getAllDestinations(),
     getSiteContentMany(['hero', 'testimonials']),
+    isAdminViewer(),
   ]);
   const { hero, testimonials } = content;
-  const upcoming = sortByNextDeparture(all).slice(0, 4);
+  const upcoming = sortByNextDeparture(all).slice(0, 6);
+  const today = new Date(new Date().setHours(0, 0, 0, 0));
+
+  const gridItems: GridDestination[] = upcoming.map((d) => {
+    const next = getNextAnyDeparture(d);
+    const upcomingCount = d.departures.filter(
+      (dep) => new Date(dep.dateISO) >= today,
+    ).length;
+    return {
+      slug: d.slug,
+      title: d.title,
+      region: d.region,
+      excerpt: d.excerpt,
+      coverImage: d.coverImage,
+      nextDateLabel: next?.dateLabel ?? null,
+      nextDateISO: next?.dateISO ?? null,
+      nextStatus: next?.status ?? null,
+      nextId: next?.id ?? null,
+      upcomingCount,
+    };
+  });
 
   return (
     <>
@@ -61,12 +83,8 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <div className="dest-list-wrap" style={{ paddingTop: 8 }}>
-          <div className="dest-list">
-            {upcoming.map((d) => (
-              <DestinationCard key={d.slug} destination={d} />
-            ))}
-          </div>
+        <div className="dest-grid-wrap" style={{ paddingTop: 8 }}>
+          <DestinationsGrid items={gridItems} isAdmin={isAdmin} showToolbar={false} />
           <div style={{ textAlign: 'center', marginTop: 40 }}>
             <Link href="/uticelok" className="btn-outline-dark btn-large">
               Az összes úticél megtekintése
