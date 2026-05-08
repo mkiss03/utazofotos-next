@@ -289,12 +289,39 @@ export function ScheduleCalendar({ entries }: Props) {
     return map;
   }, [yearEntries, byDate]);
 
-  // Baton tick: increments every 430ms to move the plane cell-by-cell
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 430);
-    return () => clearInterval(id);
-  }, []);
+  // CSS-only baton: generate @keyframes per unique trip duration (no React re-renders)
+  const uniqueNValues = useMemo(() => {
+    const set = new Set<number>();
+    for (const e of yearEntries) {
+      if (e.durationDays && e.durationDays > 1) set.add(e.durationDays);
+    }
+    return [...set];
+  }, [yearEntries]);
+
+  const keyframeCSS = useMemo(() => {
+    return uniqueNValues.map((n) => {
+      const end     = (100 / n).toFixed(3);
+      const fadeIn  = (8   / n).toFixed(3);
+      const fadeOut = (90  / n).toFixed(3);
+      const snap    = (100 / n + 0.002).toFixed(3);
+      const lPeak   = (5   / n).toFixed(3);
+      const lSettle = (20  / n).toFixed(3);
+      return [
+        `@keyframes cal-fly-n${n}{`,
+        `0%{left:-10px;opacity:0}`,
+        `${fadeIn}%{opacity:1}`,
+        `${fadeOut}%{opacity:1}`,
+        `${end}%{left:calc(100% + 6px);opacity:0}`,
+        `${snap}%{left:-10px;opacity:0}`,
+        `100%{left:-10px;opacity:0}}`,
+        `@keyframes cal-launch-n${n}{`,
+        `0%{transform:rotate(-14deg) scale(1) translateY(0)}`,
+        `${lPeak}%{transform:rotate(-22deg) scale(1.25) translateY(-4px)}`,
+        `${lSettle}%{transform:rotate(-14deg) scale(1) translateY(0)}`,
+        `100%{transform:rotate(-14deg) scale(1) translateY(0)}}`,
+      ].join('');
+    }).join('');
+  }, [uniqueNValues]);
 
   const detailEntries = useMemo(() => {
     if (!selectedISO) return [];
@@ -383,6 +410,7 @@ export function ScheduleCalendar({ entries }: Props) {
         </span>
       </div>
 
+      {keyframeCSS && <style dangerouslySetInnerHTML={{ __html: keyframeCSS }} />}
       <div className="cal2-grid">
         {Array.from({ length: 12 }, (_, m) => (
           <MiniMonth
@@ -394,7 +422,6 @@ export function ScheduleCalendar({ entries }: Props) {
             endMap={endMap}
             todayISO={todayStr}
             selectedISO={selectedISO}
-            tick={tick}
             onSelect={setSelectedISO}
           />
         ))}
@@ -426,7 +453,6 @@ function MiniMonth({
   endMap,
   todayISO,
   selectedISO,
-  tick,
   onSelect,
 }: {
   year: number;
@@ -436,7 +462,6 @@ function MiniMonth({
   endMap: Map<string, Array<{ entry: ScheduleEntry; dayIndex: number }>>;
   todayISO: string;
   selectedISO: string | null;
-  tick: number;
   onSelect: (iso: string | null) => void;
 }) {
   const total = daysInMonth(year, monthIdx);
@@ -483,10 +508,7 @@ function MiniMonth({
               const rStatus = primary.entry.status;
               const isEnd = endMap.has(iso);
               const titles = rList.map((r) => r.entry.destinationTitle).join(', ');
-              // Baton: plane is in this cell when tick mod durationDays === dayIndex
-              const isActive =
-                !!primary.entry.durationDays &&
-                tick % primary.entry.durationDays === primary.dayIndex;
+              const n = primary.entry.durationDays ?? 1;
               return (
                 <span
                   key={i}
@@ -494,13 +516,19 @@ function MiniMonth({
                   title={isEnd ? `${titles} – érkezés` : titles}
                   aria-label={`${d}.${isEnd ? ' (érkezés)' : ''}`}
                 >
-                  {isActive && (
-                    <Plane
-                      size={isEnd ? 9 : 9}
-                      aria-hidden="true"
-                      className={`cal2-baton-plane ${isEnd ? 'is-landing' : 'is-flying'}`}
-                    />
-                  )}
+                  <Plane
+                    size={9}
+                    aria-hidden="true"
+                    className={`cal2-baton-plane ${isEnd ? 'is-landing' : 'is-flying'}`}
+                    style={{
+                      animationName: `cal-fly-n${n}`,
+                      animationDuration: `${n * 430}ms`,
+                      animationDelay: `${primary.dayIndex * 430}ms`,
+                      animationIterationCount: 'infinite',
+                      animationTimingFunction: 'ease-in-out',
+                      animationFillMode: 'both',
+                    }}
+                  />
                   <span className="cal2-cell-num">{d}</span>
                 </span>
               );
@@ -518,11 +546,6 @@ function MiniMonth({
           const status = bestStatus(list!);
           const tripEntry = list!.find((e) => e.durationDays && e.durationDays > 1);
           const isTripStart = !!tripEntry;
-          // Baton: start day = dayIndex 0
-          const isStartActive =
-            isTripStart &&
-            !!tripEntry!.durationDays &&
-            tick % tripEntry!.durationDays === 0;
           return (
             <button
               key={i}
@@ -537,7 +560,13 @@ function MiniMonth({
                 <Plane
                   size={11}
                   aria-hidden="true"
-                  className={`cal2-baton-plane is-takeoff-icon ${isStartActive ? 'is-launching' : ''}`}
+                  className="cal2-baton-plane is-takeoff-icon"
+                  style={tripEntry!.durationDays ? {
+                    animationName: `cal-launch-n${tripEntry!.durationDays}`,
+                    animationDuration: `${tripEntry!.durationDays * 430}ms`,
+                    animationIterationCount: 'infinite',
+                    animationTimingFunction: 'ease-in-out',
+                  } : undefined}
                 />
               ) : (
                 <span className="cal2-cell-icon">
