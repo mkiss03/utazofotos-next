@@ -272,6 +272,20 @@ export function ScheduleCalendar({ entries }: Props) {
     return map;
   }, [yearEntries, byDate]);
 
+  // End days: the final day of each multi-day trip (landing day)
+  const endSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const e of yearEntries) {
+      if (!e.durationDays || e.durationDays <= 1) continue;
+      const [y, mo, d] = e.dateISO.split('-').map(Number);
+      const end = new Date(y, mo - 1, d);
+      end.setDate(end.getDate() + e.durationDays - 1);
+      const iso = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
+      if (!byDate.has(iso)) set.add(iso);
+    }
+    return set;
+  }, [yearEntries, byDate]);
+
   const detailEntries = useMemo(() => {
     if (!selectedISO) return [];
     return (byDate.get(selectedISO) ?? []).slice();
@@ -367,6 +381,7 @@ export function ScheduleCalendar({ entries }: Props) {
             monthIdx={m}
             byDate={byDate}
             rangeMap={rangeMap}
+            endSet={endSet}
             todayISO={todayStr}
             selectedISO={selectedISO}
             onSelect={setSelectedISO}
@@ -397,6 +412,7 @@ function MiniMonth({
   monthIdx,
   byDate,
   rangeMap,
+  endSet,
   todayISO,
   selectedISO,
   onSelect,
@@ -405,6 +421,7 @@ function MiniMonth({
   monthIdx: number;
   byDate: Map<string, ScheduleEntry[]>;
   rangeMap: Map<string, ScheduleEntry[]>;
+  endSet: Set<string>;
   todayISO: string;
   selectedISO: string | null;
   onSelect: (iso: string | null) => void;
@@ -450,15 +467,22 @@ function MiniMonth({
             const rList = rangeMap.get(iso);
             if (rList && rList.length > 0) {
               const rStatus = bestStatus(rList);
+              const transport = rList[0].transportMode;
               const titles = rList.map((e) => e.destinationTitle).join(', ');
+              const isLanding = endSet.has(iso);
               return (
                 <span
                   key={i}
-                  className={`cal2-cell is-range is-range-${rStatus} ${isPast ? 'is-past' : ''} ${isToday ? 'is-today' : ''}`}
-                  title={titles}
-                  aria-label={`${d}. – ${titles}`}
+                  className={`cal2-cell is-range is-range-${rStatus} ${isLanding ? 'is-range-end' : 'is-range-trail'} ${isPast ? 'is-past' : ''} ${isToday ? 'is-today' : ''}`}
+                  title={isLanding ? `${titles} – érkezés` : titles}
+                  aria-label={`${d}. – ${titles}${isLanding ? ' (érkezés)' : ''}`}
                 >
-                  {d}
+                  {isLanding ? (
+                    <span className="cal2-cell-land-icon">
+                      <TransportIcon mode={transport} size={10} />
+                    </span>
+                  ) : null}
+                  <span className="cal2-cell-num">{d}</span>
                 </span>
               );
             }
@@ -473,11 +497,12 @@ function MiniMonth({
           }
           const status = bestStatus(list!);
           const transport = list![0].transportMode;
+          const isTripStart = list!.some((e) => e.durationDays && e.durationDays > 1);
           return (
             <button
               key={i}
               type="button"
-              className={`cal2-cell has-event status-${status} ${isPast ? 'is-past' : ''} ${isToday ? 'is-today' : ''} ${isSelected ? 'is-selected' : ''}`}
+              className={`cal2-cell has-event status-${status} ${isPast ? 'is-past' : ''} ${isToday ? 'is-today' : ''} ${isSelected ? 'is-selected' : ''} ${isTripStart ? 'is-takeoff' : ''}`}
               onClick={() => onSelect(isSelected ? null : iso)}
               aria-label={`${d}. – ${list!.length} indulás`}
               aria-pressed={isSelected}

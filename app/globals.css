@@ -2721,6 +2721,66 @@ button.cal2-cell.has-event.is-past { background: #b0b0b0; opacity: .65; }
 .cal2-cell.is-range-few { background: #fce8c6; color: #7a4500; }
 .cal2-cell.is-range-full { background: #e8e8e8; color: #4a4a4a; }
 .cal2-cell.is-range.is-past { opacity: .5; }
+
+/* ── Flight animations ────────────────────────────── */
+/* Takeoff: start-day plane floats up */
+@keyframes cal-takeoff {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  40%       { transform: translateY(-4px) rotate(-12deg); }
+  70%       { transform: translateY(-2px) rotate(-8deg); }
+}
+/* Trail: dashes slide right on middle days */
+@keyframes cal-trail {
+  from { background-position-x: 0; }
+  to   { background-position-x: 20px; }
+}
+/* Landing: end-day plane bobs gently down */
+@keyframes cal-land {
+  0%, 100% { transform: rotate(20deg) translateY(0); }
+  50%       { transform: rotate(14deg) translateY(3px); }
+}
+
+/* Start day: animated takeoff icon */
+button.cal2-cell.is-takeoff .cal2-cell-icon svg {
+  animation: cal-takeoff 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Middle trail days: animated dashed flight path line */
+.cal2-cell.is-range-trail {
+  overflow: hidden;
+}
+.cal2-cell.is-range-trail::after {
+  content: '';
+  position: absolute;
+  left: -4px; right: -4px;
+  top: 50%; height: 2px;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,.85) 0, rgba(255,255,255,.85) 4px,
+    transparent 4px, transparent 9px
+  );
+  background-size: 9px 2px;
+  animation: cal-trail 0.7s linear infinite;
+  pointer-events: none;
+}
+
+/* Landing day: icon + landing animation */
+.cal2-cell.is-range-end {
+  flex-direction: column;
+  gap: 1px;
+}
+.cal2-cell-land-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+.cal2-cell-land-icon svg {
+  animation: cal-land 2.2s ease-in-out infinite;
+  transform-origin: center;
+}
 button.cal2-cell.has-event.is-selected {
   outline: 3px solid var(--ink);
   outline-offset: 2px;
