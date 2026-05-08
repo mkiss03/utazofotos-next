@@ -2753,12 +2753,12 @@ button.cal2-cell.has-event.is-takeoff:hover {
   90%  { opacity: 1;  transform: rotate(-10deg) scale(1); }
   100% { left: calc(100% + 6px); opacity: 0; transform: rotate(-10deg) scale(.7); }
 }
-/* Landing plane: enters from right, gently tilts down */
+/* Landing plane: LEFT → RIGHT same as others, but nose tilted down */
 @keyframes cal-baton-land {
-  0%   { left: calc(100% + 6px); opacity: 0; transform: rotate(10deg) scale(.7); }
-  8%   { opacity: 1; transform: rotate(10deg) scale(1); }
-  90%  { opacity: 1; transform: rotate(8deg) scale(1); left: 30%; }
-  100% { left: 20%; opacity: .8; transform: rotate(12deg) scale(1.05); }
+  0%   { left: -10px; opacity: 0; transform: rotate(14deg) scale(.7); }
+  8%   { opacity: 1;  transform: rotate(14deg) scale(1); }
+  80%  { opacity: 1;  transform: rotate(18deg) scale(1); }
+  100% { left: calc(100% + 6px); opacity: 0; transform: rotate(18deg) scale(.7); }
 }
 /* Launch: plane rises and tilts on the start day */
 @keyframes cal-baton-launch {
@@ -2781,6 +2781,7 @@ button.cal2-cell.has-event.is-takeoff:hover {
   animation: cal-baton-fly 0.38s ease-in-out forwards;
 }
 .cal2-baton-plane.is-landing {
+  left: -10px;
   animation: cal-baton-land 0.38s ease-in-out forwards;
 }
 /* Start cell: icon in normal position, launches when active */
