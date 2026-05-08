@@ -35,11 +35,11 @@ export default async function JelentkezesPage() {
           </div>
           <div className="form-step">
             <div className="step-n">2</div>
-            <div className="step-t">Fizess előleget</div>
+            <div className="step-t">E-mailes visszaigazolás</div>
           </div>
           <div className="form-step">
             <div className="step-n">3</div>
-            <div className="step-t">E-mailes visszaigazolás</div>
+            <div className="step-t">Fizess előleget</div>
           </div>
           <div className="form-step">
             <div className="step-n">4</div>

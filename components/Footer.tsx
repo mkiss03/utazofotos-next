@@ -30,6 +30,12 @@ export async function Footer({ withSocial = true }: { withSocial?: boolean }) {
   return (
     <footer>
       <div className="f-copy">© {year} UtazóFotós | Minden jog fenntartva</div>
+      <nav className="f-legal" aria-label="Jogi">
+        <a href="/impresszum">Impresszum</a>
+        <a href="/adatvedelem">Adatvédelem</a>
+        <a href="/aszf">ÁSZF</a>
+        <a href="/sutik">Sütik</a>
+      </nav>
       {withSocial && contact && (
         <div className="f-social">
           {contact.facebookUrl && (

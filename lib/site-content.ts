@@ -70,6 +70,15 @@ export type SiteContentMap = {
   schedule: ScheduleContent;
   testimonials: TestimonialsContent;
   contact: ContactContent;
+  legalImprint: LegalPageContent;
+  legalPrivacy: LegalPageContent;
+  legalTerms: LegalPageContent;
+  legalCookies: LegalPageContent;
+};
+
+export type LegalPageContent = {
+  lastUpdated: string;
+  html: string;
 };
 
 export const DEFAULTS: SiteContentMap = {
@@ -153,6 +162,111 @@ export const DEFAULTS: SiteContentMap = {
     instagramLabel: '@utazofotos',
     tiktokUrl: '',
     tiktokLabel: '@utazofotos',
+  },
+  legalImprint: {
+    lastUpdated: '2026-05-08',
+    html: `<h2>Impresszum</h2>
+<p>A 2001. évi CVIII. törvény (Ekertv.) 4. § alapján kötelező adatok:</p>
+<dl>
+  <dt>Vállalkozás neve</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>Székhely</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>Adószám</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>Nyilvántartási szám</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>E-mail</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>Telefon</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>Tárhelyszolgáltató</dt><dd>Vercel Inc., 340 Pine Street Suite 900, San Francisco, CA 94104, USA — <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></dd>
+</dl>
+<p>A webhely üzemeltetésére a magyar jog, különösen a 2001. évi CVIII. törvény az irányadó.</p>`,
+  },
+  legalPrivacy: {
+    lastUpdated: '2026-05-08',
+    html: `<h2>Adatvédelmi tájékoztató</h2>
+<p>Hatályos: [KITÖLTENDŐ dátum]. Az adatkezelés az EU 2016/679 rendeletével (GDPR) összhangban történik.</p>
+
+<h3>1. Adatkezelő</h3>
+<dl>
+  <dt>Név</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>Cím</dt><dd>[KITÖLTENDŐ]</dd>
+  <dt>E-mail</dt><dd>[KITÖLTENDŐ]</dd>
+</dl>
+
+<h3>2. Kezelt adatok és céljaik</h3>
+<table>
+  <thead><tr><th>Adat</th><th>Cél</th><th>Jogalap</th><th>Megőrzés</th></tr></thead>
+  <tbody>
+    <tr><td>Név, e-mail, telefonszám</td><td>Jelentkezés feldolgozása, visszaigazolás</td><td>GDPR 6. cikk (1) b) — szerződés teljesítése</td><td>Az utazás teljesítésétől számított 5 év</td></tr>
+    <tr><td>IP-cím (szerver napló)</td><td>Biztonság, hibaelhárítás</td><td>GDPR 6. cikk (1) f) — jogos érdek</td><td>90 nap</td></tr>
+  </tbody>
+</table>
+
+<h3>3. Adatfeldolgozók</h3>
+<ul>
+  <li><strong>Vercel Inc.</strong> — tárhelyszolgáltatás (USA, megfelelő garanciák: SCCs)</li>
+  <li><strong>Supabase Inc.</strong> — adatbázis (EU régió: eu-west-1)</li>
+  <li><strong>[KITÖLTENDŐ — pl. e-mail szolgáltató]</strong> — értesítések küldése</li>
+</ul>
+
+<h3>4. Érintetti jogok</h3>
+<p>Hozzáférés, helyesbítés, törlés, adathordozhatóság, tiltakozás joga. Kérelemmel forduljon hozzánk: <strong>[KITÖLTENDŐ e-mail]</strong>. Jogorvoslat: <a href="https://naih.hu" target="_blank" rel="noopener">NAIH (naih.hu)</a>.</p>
+
+<h3>5. Adatbiztonság</h3>
+<p>Az adatokat titkosított kapcsolaton (HTTPS/TLS) keresztül kezeljük. A rendszer hozzáférése jelszóval védett, harmadik féllel az adatokat nem osztjuk meg.</p>`,
+  },
+  legalTerms: {
+    lastUpdated: '2026-05-08',
+    html: `<h2>Általános Szerződési Feltételek (ÁSZF)</h2>
+<p>Hatályos: [KITÖLTENDŐ dátum].</p>
+
+<h3>1. Szerződő felek</h3>
+<p><strong>Szolgáltató:</strong> [KITÖLTENDŐ vállalkozás neve, székhely, adószám]<br>
+<strong>Ügyfél:</strong> a jelentkezési űrlapot kitöltő természetes személy.</p>
+
+<h3>2. A szerződés létrejötte</h3>
+<p>A szerződés az ügyfél online jelentkezésének elküldésével és az e-mailes visszaigazolással jön létre. A visszaigazolás nem automatikus — a szolgáltató fenntartja a foglalás elfogadásának vagy elutasításának jogát.</p>
+
+<h3>3. Részvételi díj és fizetés</h3>
+<ul>
+  <li>A részvételi díj az utazás oldalán feltüntetett összeg.</li>
+  <li>Foglaláskor <strong>[KITÖLTENDŐ, pl. 30%]</strong> előleg fizetendő, a fennmaradó összeg legkésőbb az indulás előtt <strong>[KITÖLTENDŐ, pl. 30]</strong> nappal esedékes.</li>
+  <li>Fizetési mód: [KITÖLTENDŐ — pl. banki átutalás, iban, stb.]</li>
+</ul>
+
+<h3>4. Lemondás, visszatérítés</h3>
+<ul>
+  <li>Az indulás előtt több mint 45 nappal: a befizetett összeg <strong>teljes egészében</strong> visszajár.</li>
+  <li>45–30 nap: <strong>50%</strong> visszatérítés.</li>
+  <li>30 napon belül: <strong>nem jár visszatérítés</strong>, kivéve, ha az ügyfél helyett mást küld.</li>
+  <li>Vis maior esetén (pl. járványügyi tilalom, természeti katasztrófa) egyedi elbírálás alapján jóváírás vagy visszatérítés lehetséges.</li>
+</ul>
+
+<h3>5. A szolgáltató felelőssége</h3>
+<p>A szolgáltató az utazás lebonyolítását legjobb tudása szerint szervezi. Nem vállal felelősséget az utazón kívül álló körülmények (időjárás, sztrájk, hatósági intézkedés) által okozott esetleges változásokért.</p>
+
+<h3>6. Panaszkezelés</h3>
+<p>Panasz esetén: <strong>[KITÖLTENDŐ e-mail]</strong>. A beérkező panaszokra 15 munkanapon belül írásban válaszolunk. Vitás ügyekben a felek elsősorban peren kívüli megegyezésre törekszenek; ennek eredménytelensége esetén a [KITÖLTENDŐ — illetékes bíróság] illetékes.</p>
+
+<h3>7. Alkalmazandó jog</h3>
+<p>A szerződésre a magyar jog, különösen a Ptk. és az utazási szerződésre vonatkozó jogszabályok az irányadók.</p>`,
+  },
+  legalCookies: {
+    lastUpdated: '2026-05-08',
+    html: `<h2>Sütitájékoztató</h2>
+<p>Hatályos: [KITÖLTENDŐ dátum].</p>
+
+<h3>Milyen sütiket használunk?</h3>
+<table>
+  <thead><tr><th>Süti neve</th><th>Típus</th><th>Cél</th><th>Lejárat</th></tr></thead>
+  <tbody>
+    <tr><td>next-auth.session-token</td><td>Munkamenet (technikai)</td><td>Admin bejelentkezés fenntartása</td><td>Session / 30 nap</td></tr>
+    <tr><td>next-auth.csrf-token</td><td>Biztonsági (technikai)</td><td>CSRF-támadás elleni védelem</td><td>Session</td></tr>
+  </tbody>
+</table>
+
+<h3>Harmadik féltől származó sütik</h3>
+<p>A webhely jelenleg <strong>nem használ</strong> marketing-, analitikai vagy közösségi media sütiket (pl. Google Analytics, Meta Pixel).</p>
+
+<h3>Sütik letiltása</h3>
+<p>A sütik böngészőben letilthatók (Beállítások → Adatvédelem / Sütik), de a technikai sütik kikapcsolása az admin felület működését befolyásolhatja. A nyilvános oldal sütik nélkül is teljes értékűen működik.</p>`,
   },
 };
 

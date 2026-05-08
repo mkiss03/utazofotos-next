@@ -202,3 +202,34 @@ export async function saveContact(
   revalidatePath('/rolam');
   return { ok: true };
 }
+
+const legalSchema = z.object({
+  key: z.enum(['legalImprint', 'legalPrivacy', 'legalTerms', 'legalCookies']),
+  lastUpdated: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, 'Érvénytelen dátum (ÉÉÉÉ-HH-NN).'),
+  html: z.string().trim().min(1, 'A tartalom nem lehet üres.').max(50000),
+});
+
+export async function saveLegalPage(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const userId = await requireAdmin();
+  const parsed = legalSchema.safeParse({
+    key: formData.get('key'),
+    lastUpdated: formData.get('lastUpdated'),
+    html: formData.get('html'),
+  });
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Hibás adatok.' };
+  }
+  const { key, ...value } = parsed.data;
+  await setSiteContent(key, value, userId);
+  const slugMap: Record<string, string> = {
+    legalImprint: '/impresszum',
+    legalPrivacy: '/adatvedelem',
+    legalTerms: '/aszf',
+    legalCookies: '/sutik',
+  };
+  revalidatePath(slugMap[key]);
+  return { ok: true };
+}

@@ -108,8 +108,29 @@ nav.main-nav.scrolled { box-shadow: 0 2px 16px rgba(0, 0, 0, .07); }
 /* FOOTER */
 footer { background: var(--white); border-top: 1px solid var(--border); padding: 28px 24px; text-align: center; }
 .f-copy { font-size: .76rem; color: var(--muted); letter-spacing: .04em; }
+.f-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; margin-top: 10px; }
+.f-legal a { font-size: .73rem; color: var(--muted); transition: var(--trans); }
+.f-legal a:hover { color: var(--text); }
 .f-fb { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; font-size: .76rem; color: var(--mid); transition: var(--trans); }
 .f-fb:hover { color: var(--text); }
+
+/* LEGAL PAGES */
+.legal-page { max-width: var(--max); margin: 0 auto; padding: 60px 32px 88px; }
+.legal-inner { max-width: 760px; }
+.legal-body h2 { font-family: var(--serif); font-size: 1.9rem; font-weight: 500; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.legal-body h3 { font-size: 1.1rem; font-weight: 700; margin: 28px 0 10px; }
+.legal-body h4 { font-size: 1rem; font-weight: 700; margin: 20px 0 8px; }
+.legal-body p { font-size: .97rem; line-height: 1.8; margin-bottom: 14px; }
+.legal-body ul, .legal-body ol { padding-left: 1.4em; margin-bottom: 14px; }
+.legal-body li { font-size: .97rem; line-height: 1.75; margin-bottom: 6px; }
+.legal-body dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 20px; margin-bottom: 16px; }
+.legal-body dt { font-weight: 700; font-size: .9rem; color: var(--mid); }
+.legal-body dd { font-size: .95rem; margin: 0; }
+.legal-body table { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: .88rem; }
+.legal-body th { text-align: left; padding: 8px 12px; background: var(--light); border-bottom: 2px solid var(--border); font-weight: 700; }
+.legal-body td { padding: 7px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.legal-body a { color: var(--accent); text-decoration: underline; }
+.legal-updated { font-size: .75rem; color: var(--muted); margin-top: 40px; border-top: 1px solid var(--border); padding-top: 14px; }
 
 /* PAGE HERO */
 .ph { background: var(--light); border-bottom: 1px solid var(--border); padding: 56px 24px; text-align: center; }
