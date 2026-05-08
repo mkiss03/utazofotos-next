@@ -2755,8 +2755,8 @@ button.cal2-cell.is-takeoff .cal2-takeoff-icon {
 /* End cell: plane icon same color as the strip text */
 .cal2-cell.is-range-end .cal2-range-icon {
   display: block;
-  opacity: .9;
-  transform: rotate(12deg);
+  opacity: .95;
+  transform: rotate(-12deg);
 }
 button.cal2-cell.has-event.is-selected {
   outline: 3px solid var(--ink);
