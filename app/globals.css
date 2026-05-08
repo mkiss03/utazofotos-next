@@ -2733,8 +2733,8 @@ button.cal2-cell.has-event.is-takeoff:hover {
   box-shadow: 0 6px 14px rgba(0,0,0,.18), 3px 0 0 0 #c8e8d4;
 }
 
-/* Range days: middle cells */
-.cal2-cell.is-range { cursor: default; font-size: .83rem; border-radius: 0; overflow: visible; position: relative; }
+/* Range days: middle/end cells */
+.cal2-cell.is-range { cursor: default; font-size: .83rem; border-radius: 0; overflow: visible; position: relative; flex-direction: column; gap: 1px; }
 .cal2-cell.is-range-mid.is-range-available { background: #c8e8d4; color: #1a4d2b; box-shadow: -3px 0 0 0 #c8e8d4, 3px 0 0 0 #c8e8d4; }
 .cal2-cell.is-range-mid.is-range-few      { background: #f7dcb0; color: #7a4500; box-shadow: -3px 0 0 0 #f7dcb0, 3px 0 0 0 #f7dcb0; }
 .cal2-cell.is-range-mid.is-range-full     { background: #d8d8d8; color: #4a4a4a; box-shadow: -3px 0 0 0 #d8d8d8, 3px 0 0 0 #d8d8d8; }
