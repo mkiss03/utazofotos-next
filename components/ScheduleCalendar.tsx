@@ -250,6 +250,28 @@ export function ScheduleCalendar({ entries }: Props) {
     return map;
   }, [yearEntries]);
 
+  // Range days: the intermediate/end days of multi-day trips (durationDays > 1)
+  const rangeMap = useMemo(() => {
+    const map = new Map<string, ScheduleEntry[]>();
+    for (const e of yearEntries) {
+      if (!e.durationDays || e.durationDays <= 1) continue;
+      const [y, mo, d] = e.dateISO.split('-').map(Number);
+      const start = new Date(y, mo - 1, d);
+      for (let i = 1; i < e.durationDays; i++) {
+        const cur = new Date(start);
+        cur.setDate(cur.getDate() + i);
+        const iso = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
+        // Don't add if that day already has its own start event
+        if (!byDate.has(iso)) {
+          const arr = map.get(iso) ?? [];
+          arr.push(e);
+          map.set(iso, arr);
+        }
+      }
+    }
+    return map;
+  }, [yearEntries, byDate]);
+
   const detailEntries = useMemo(() => {
     if (!selectedISO) return [];
     return (byDate.get(selectedISO) ?? []).slice();
@@ -315,6 +337,11 @@ export function ScheduleCalendar({ entries }: Props) {
           </span>
           <span className="cal2-legend-sep" />
           <span className="cal2-legend-item">
+            <span className="cal2-dot" style={{ background: '#d4eedd', border: '1px solid #aad4bb' }} />
+            Út napjai
+          </span>
+          <span className="cal2-legend-sep" />
+          <span className="cal2-legend-item">
             <Plane size={14} />
             Repülő
           </span>
@@ -339,6 +366,7 @@ export function ScheduleCalendar({ entries }: Props) {
             year={year}
             monthIdx={m}
             byDate={byDate}
+            rangeMap={rangeMap}
             todayISO={todayStr}
             selectedISO={selectedISO}
             onSelect={setSelectedISO}
@@ -368,6 +396,7 @@ function MiniMonth({
   year,
   monthIdx,
   byDate,
+  rangeMap,
   todayISO,
   selectedISO,
   onSelect,
@@ -375,6 +404,7 @@ function MiniMonth({
   year: number;
   monthIdx: number;
   byDate: Map<string, ScheduleEntry[]>;
+  rangeMap: Map<string, ScheduleEntry[]>;
   todayISO: string;
   selectedISO: string | null;
   onSelect: (iso: string | null) => void;
@@ -416,6 +446,22 @@ function MiniMonth({
           const isSelected = iso === selectedISO;
 
           if (!has) {
+            // Check if this day is mid-trip (part of a multi-day journey)
+            const rList = rangeMap.get(iso);
+            if (rList && rList.length > 0) {
+              const rStatus = bestStatus(rList);
+              const titles = rList.map((e) => e.destinationTitle).join(', ');
+              return (
+                <span
+                  key={i}
+                  className={`cal2-cell is-range is-range-${rStatus} ${isPast ? 'is-past' : ''} ${isToday ? 'is-today' : ''}`}
+                  title={titles}
+                  aria-label={`${d}. – ${titles}`}
+                >
+                  {d}
+                </span>
+              );
+            }
             return (
               <span
                 key={i}

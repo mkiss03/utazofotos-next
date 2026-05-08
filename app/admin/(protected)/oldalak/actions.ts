@@ -165,6 +165,15 @@ const contactSchema = z.object({
       'Érvénytelen Instagram URL — https://... formátum szükséges.',
     ),
   instagramLabel: z.string().trim().max(120),
+  tiktokUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .refine(
+      (v) => v === '' || /^https?:\/\//.test(v),
+      'Érvénytelen TikTok URL — https://... formátum szükséges.',
+    ),
+  tiktokLabel: z.string().trim().max(120),
 });
 
 export async function saveContact(
@@ -179,6 +188,8 @@ export async function saveContact(
     facebookLabel: formData.get('facebookLabel'),
     instagramUrl: formData.get('instagramUrl') ?? '',
     instagramLabel: formData.get('instagramLabel') ?? '',
+    tiktokUrl: formData.get('tiktokUrl') ?? '',
+    tiktokLabel: formData.get('tiktokLabel') ?? '',
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? 'Hibás adatok.' };

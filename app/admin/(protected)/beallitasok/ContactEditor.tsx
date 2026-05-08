@@ -16,6 +16,8 @@ export function ContactEditor({ initial: data }: { initial: ContactContent }) {
   const [facebookLabel, setFacebookLabel] = useState(data.facebookLabel);
   const [instagramUrl, setInstagramUrl] = useState(data.instagramUrl ?? '');
   const [instagramLabel, setInstagramLabel] = useState(data.instagramLabel ?? '@utazofotos');
+  const [tiktokUrl, setTiktokUrl] = useState(data.tiktokUrl ?? '');
+  const [tiktokLabel, setTiktokLabel] = useState(data.tiktokLabel ?? '@utazofotos');
 
   function submit(fd: FormData) {
     startTransition(() => action(fd));
@@ -25,74 +27,44 @@ export function ContactEditor({ initial: data }: { initial: ContactContent }) {
     <form className="admin-form-grid" action={submit}>
       <div className="admin-field">
         <label htmlFor="ct-phone">Telefonszám</label>
-        <input
-          id="ct-phone"
-          name="phone"
-          type="text"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          required
-        />
+        <input id="ct-phone" name="phone" type="text" value={phone} onChange={(e) => setPhone(e.target.value)} required />
       </div>
       <div className="admin-field">
         <label htmlFor="ct-email">E-mail cím</label>
-        <input
-          id="ct-email"
-          name="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <input id="ct-email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </div>
+
       <div className="admin-field admin-field-wide">
         <label htmlFor="ct-fb-url">Facebook csoport URL</label>
-        <input
-          id="ct-fb-url"
-          name="facebookUrl"
-          type="url"
-          value={facebookUrl}
-          onChange={(e) => setFacebookUrl(e.target.value)}
-          required
-          placeholder="https://www.facebook.com/groups/..."
-        />
+        <input id="ct-fb-url" name="facebookUrl" type="url" value={facebookUrl} onChange={(e) => setFacebookUrl(e.target.value)} required placeholder="https://www.facebook.com/groups/..." />
       </div>
       <div className="admin-field admin-field-wide">
         <label htmlFor="ct-fb-label">Facebook megnevezése (megjelenő szöveg)</label>
-        <input
-          id="ct-fb-label"
-          name="facebookLabel"
-          type="text"
-          value={facebookLabel}
-          onChange={(e) => setFacebookLabel(e.target.value)}
-        />
+        <input id="ct-fb-label" name="facebookLabel" type="text" value={facebookLabel} onChange={(e) => setFacebookLabel(e.target.value)} />
       </div>
+
       <div className="admin-field admin-field-wide">
         <label htmlFor="ct-ig-url">
           Instagram URL{' '}
-          <span className="admin-field-hint" style={{ display: 'inline', marginLeft: 6 }}>
-            (hagyd üresen, ha még nincs Instagram fiók — nem jelenik meg az oldalon)
-          </span>
+          <span className="admin-field-hint" style={{ display: 'inline', marginLeft: 6 }}>(hagyd üresen, ha nincs — nem jelenik meg az oldalon)</span>
         </label>
-        <input
-          id="ct-ig-url"
-          name="instagramUrl"
-          type="url"
-          value={instagramUrl}
-          onChange={(e) => setInstagramUrl(e.target.value)}
-          placeholder="https://www.instagram.com/utazofotos"
-        />
+        <input id="ct-ig-url" name="instagramUrl" type="url" value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://www.instagram.com/utazofotos" />
       </div>
       <div className="admin-field admin-field-wide">
-        <label htmlFor="ct-ig-label">Instagram megnevezése (megjelenő szöveg)</label>
-        <input
-          id="ct-ig-label"
-          name="instagramLabel"
-          type="text"
-          value={instagramLabel}
-          onChange={(e) => setInstagramLabel(e.target.value)}
-          placeholder="@utazofotos"
-        />
+        <label htmlFor="ct-ig-label">Instagram megnevezése</label>
+        <input id="ct-ig-label" name="instagramLabel" type="text" value={instagramLabel} onChange={(e) => setInstagramLabel(e.target.value)} placeholder="@utazofotos" />
+      </div>
+
+      <div className="admin-field admin-field-wide">
+        <label htmlFor="ct-tt-url">
+          TikTok URL{' '}
+          <span className="admin-field-hint" style={{ display: 'inline', marginLeft: 6 }}>(hagyd üresen, ha nincs — nem jelenik meg az oldalon)</span>
+        </label>
+        <input id="ct-tt-url" name="tiktokUrl" type="url" value={tiktokUrl} onChange={(e) => setTiktokUrl(e.target.value)} placeholder="https://www.tiktok.com/@utazofotos" />
+      </div>
+      <div className="admin-field admin-field-wide">
+        <label htmlFor="ct-tt-label">TikTok megnevezése</label>
+        <input id="ct-tt-label" name="tiktokLabel" type="text" value={tiktokLabel} onChange={(e) => setTiktokLabel(e.target.value)} placeholder="@utazofotos" />
       </div>
 
       <div className="admin-form-bar admin-field-wide">

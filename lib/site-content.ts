@@ -60,6 +60,8 @@ export type ContactContent = {
   facebookLabel: string;
   instagramUrl: string;
   instagramLabel: string;
+  tiktokUrl: string;
+  tiktokLabel: string;
 };
 
 export type SiteContentMap = {
@@ -149,6 +151,8 @@ export const DEFAULTS: SiteContentMap = {
     facebookLabel: 'Utazó fotós Facebook csoport',
     instagramUrl: '',
     instagramLabel: '@utazofotos',
+    tiktokUrl: '',
+    tiktokLabel: '@utazofotos',
   },
 };
 
