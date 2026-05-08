@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Nav } from '@/components/Nav';
 import { Footer } from '@/components/Footer';
 import { getSiteContent } from '@/lib/site-content';
 
@@ -14,7 +13,6 @@ export default async function AdatvedelemPage() {
   const page = await getSiteContent('legalPrivacy');
   return (
     <>
-      <Nav />
       <main className="legal-page">
         <div className="legal-inner">
           <div
