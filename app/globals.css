@@ -2745,29 +2745,18 @@ button.cal2-cell.has-event.is-takeoff:hover {
 .cal2-cell.is-range-end.is-range-full     { background: #d8d8d8; color: #4a4a4a; box-shadow: -3px 0 0 0 #d8d8d8; }
 .cal2-cell.is-range.is-past { opacity: .5; }
 
-/* ── Baton plane: CSS-only, keyframes injected per trip via <style> ─ */
-/* Base: always-present, starts invisible (animation takes over) */
-.cal2-baton-plane {
-  position: absolute;
-  top: 50%;
-  margin-top: -5px;
-  left: -10px;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 3;
-}
-/* Flying = nose slightly up, landing = nose slightly down */
-.cal2-baton-plane.is-flying  { transform: rotate(-10deg); }
-.cal2-baton-plane.is-landing { transform: rotate(14deg);  }
-/* Start cell: static visible icon that pulses via inline cal-launch-nN */
-button.cal2-cell.is-takeoff .cal2-baton-plane.is-takeoff-icon {
-  position: relative;
-  top: auto;
-  margin-top: 0;
-  left: auto;
-  opacity: 1;
+/* ── Trip range icons ────────────────────────────────── */
+/* Start cell: larger plane icon, same color as cell text (white) */
+button.cal2-cell.is-takeoff .cal2-takeoff-icon {
   display: block;
-  transform: rotate(-14deg);
+  opacity: .95;
+  transform: rotate(-12deg);
+}
+/* End cell: plane icon same color as the strip text */
+.cal2-cell.is-range-end .cal2-range-icon {
+  display: block;
+  opacity: .9;
+  transform: rotate(12deg);
 }
 button.cal2-cell.has-event.is-selected {
   outline: 3px solid var(--ink);
