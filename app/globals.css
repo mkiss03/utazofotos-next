@@ -2715,71 +2715,86 @@ button.cal2-cell.has-event.status-available { background: var(--success); }
 button.cal2-cell.has-event.status-few { background: var(--warn); }
 button.cal2-cell.has-event.status-full { background: var(--muted); }
 button.cal2-cell.has-event.is-past { background: #b0b0b0; opacity: .65; }
-/* Range days: middle/end days of a multi-day trip */
-.cal2-cell.is-range { cursor: default; font-size: .83rem; }
-.cal2-cell.is-range-available { background: #d4eedd; color: #1a4d2b; }
-.cal2-cell.is-range-few { background: #fce8c6; color: #7a4500; }
-.cal2-cell.is-range-full { background: #e8e8e8; color: #4a4a4a; }
+/* ── Trip range: connected strip (Airbnb-style) ──────── */
+/* Start day: rounded left, bridges gap to the right */
+button.cal2-cell.has-event.is-takeoff.status-available {
+  border-radius: 8px 0 0 8px;
+  box-shadow: 3px 0 0 0 #c8e8d4;
+}
+button.cal2-cell.has-event.is-takeoff.status-few {
+  border-radius: 8px 0 0 8px;
+  box-shadow: 3px 0 0 0 #f7dcb0;
+}
+button.cal2-cell.has-event.is-takeoff.status-full {
+  border-radius: 8px 0 0 8px;
+  box-shadow: 3px 0 0 0 #d8d8d8;
+}
+button.cal2-cell.has-event.is-takeoff:hover {
+  box-shadow: 0 6px 14px rgba(0,0,0,.18), 3px 0 0 0 #c8e8d4;
+}
+
+/* Range days: middle cells */
+.cal2-cell.is-range { cursor: default; font-size: .83rem; border-radius: 0; overflow: visible; position: relative; }
+.cal2-cell.is-range-mid.is-range-available { background: #c8e8d4; color: #1a4d2b; box-shadow: -3px 0 0 0 #c8e8d4, 3px 0 0 0 #c8e8d4; }
+.cal2-cell.is-range-mid.is-range-few      { background: #f7dcb0; color: #7a4500; box-shadow: -3px 0 0 0 #f7dcb0, 3px 0 0 0 #f7dcb0; }
+.cal2-cell.is-range-mid.is-range-full     { background: #d8d8d8; color: #4a4a4a; box-shadow: -3px 0 0 0 #d8d8d8, 3px 0 0 0 #d8d8d8; }
+/* End day: rounded right, bridges gap to the left */
+.cal2-cell.is-range-end { border-radius: 0 8px 8px 0; }
+.cal2-cell.is-range-end.is-range-available { background: #c8e8d4; color: #1a4d2b; box-shadow: -3px 0 0 0 #c8e8d4; }
+.cal2-cell.is-range-end.is-range-few      { background: #f7dcb0; color: #7a4500; box-shadow: -3px 0 0 0 #f7dcb0; }
+.cal2-cell.is-range-end.is-range-full     { background: #d8d8d8; color: #4a4a4a; box-shadow: -3px 0 0 0 #d8d8d8; }
 .cal2-cell.is-range.is-past { opacity: .5; }
 
-/* ── Flight animations ────────────────────────────── */
-/* Takeoff: start-day plane floats up */
-@keyframes cal-takeoff {
-  0%, 100% { transform: translateY(0) rotate(-5deg); }
-  40%       { transform: translateY(-4px) rotate(-12deg); }
-  70%       { transform: translateY(-2px) rotate(-8deg); }
+/* ── Baton plane animations ──────────────────────────── */
+/* Plane that flies LEFT → RIGHT across a cell */
+@keyframes cal-baton-fly {
+  0%   { left: -10px; opacity: 0; transform: rotate(-10deg) scale(.7); }
+  8%   { opacity: 1;  transform: rotate(-10deg) scale(1); }
+  90%  { opacity: 1;  transform: rotate(-10deg) scale(1); }
+  100% { left: calc(100% + 6px); opacity: 0; transform: rotate(-10deg) scale(.7); }
 }
-/* Trail: dashes slide right on middle days */
-@keyframes cal-trail {
-  from { background-position-x: 0; }
-  to   { background-position-x: 20px; }
+/* Landing plane: enters from right, gently tilts down */
+@keyframes cal-baton-land {
+  0%   { left: calc(100% + 6px); opacity: 0; transform: rotate(10deg) scale(.7); }
+  8%   { opacity: 1; transform: rotate(10deg) scale(1); }
+  90%  { opacity: 1; transform: rotate(8deg) scale(1); left: 30%; }
+  100% { left: 20%; opacity: .8; transform: rotate(12deg) scale(1.05); }
 }
-/* Landing: end-day plane bobs gently down */
-@keyframes cal-land {
-  0%, 100% { transform: rotate(20deg) translateY(0); }
-  50%       { transform: rotate(14deg) translateY(3px); }
+/* Launch: plane rises and tilts on the start day */
+@keyframes cal-baton-launch {
+  0%   { transform: rotate(-14deg) translateY(0) scale(1); }
+  30%  { transform: rotate(-20deg) translateY(-4px) scale(1.2); }
+  60%  { transform: rotate(-16deg) translateY(-2px) scale(1.1); }
+  100% { transform: rotate(-14deg) translateY(0) scale(1); }
 }
 
-/* Start day: animated takeoff icon */
-button.cal2-cell.is-takeoff .cal2-cell-icon svg {
-  animation: cal-takeoff 2.4s ease-in-out infinite;
-  transform-origin: center;
-}
-
-/* Middle trail days: animated dashed flight path line */
-.cal2-cell.is-range-trail {
-  overflow: hidden;
-}
-.cal2-cell.is-range-trail::after {
-  content: '';
+/* The baton plane element itself */
+.cal2-baton-plane {
   position: absolute;
-  left: -4px; right: -4px;
-  top: 50%; height: 2px;
-  transform: translateY(-50%);
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(255,255,255,.85) 0, rgba(255,255,255,.85) 4px,
-    transparent 4px, transparent 9px
-  );
-  background-size: 9px 2px;
-  animation: cal-trail 0.7s linear infinite;
+  top: 50%;
+  margin-top: -5px;
   pointer-events: none;
+  z-index: 3;
 }
-
-/* Landing day: icon + landing animation */
-.cal2-cell.is-range-end {
-  flex-direction: column;
-  gap: 1px;
+.cal2-baton-plane.is-flying {
+  left: -10px;
+  animation: cal-baton-fly 0.38s ease-in-out forwards;
 }
-.cal2-cell-land-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
+.cal2-baton-plane.is-landing {
+  animation: cal-baton-land 0.38s ease-in-out forwards;
 }
-.cal2-cell-land-icon svg {
-  animation: cal-land 2.2s ease-in-out infinite;
-  transform-origin: center;
+/* Start cell: icon in normal position, launches when active */
+button.cal2-cell.is-takeoff .cal2-baton-plane.is-takeoff-icon {
+  position: relative;
+  top: auto;
+  margin-top: 0;
+  left: auto;
+  display: block;
+  transform: rotate(-14deg);
+  transition: transform .15s ease;
+}
+button.cal2-cell.is-takeoff .cal2-baton-plane.is-takeoff-icon.is-launching {
+  animation: cal-baton-launch 0.38s ease-in-out forwards;
 }
 button.cal2-cell.has-event.is-selected {
   outline: 3px solid var(--ink);
