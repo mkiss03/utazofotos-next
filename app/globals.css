@@ -2738,11 +2738,11 @@ button.cal2-cell.has-event.is-takeoff:hover {
 .cal2-cell.is-range-mid.is-range-available { background: #c8e8d4; color: #1a4d2b; box-shadow: -3px 0 0 0 #c8e8d4, 3px 0 0 0 #c8e8d4; }
 .cal2-cell.is-range-mid.is-range-few      { background: #f7dcb0; color: #7a4500; box-shadow: -3px 0 0 0 #f7dcb0, 3px 0 0 0 #f7dcb0; }
 .cal2-cell.is-range-mid.is-range-full     { background: #d8d8d8; color: #4a4a4a; box-shadow: -3px 0 0 0 #d8d8d8, 3px 0 0 0 #d8d8d8; }
-/* End day: rounded right, bridges gap to the left */
-.cal2-cell.is-range-end { border-radius: 0 8px 8px 0; }
-.cal2-cell.is-range-end.is-range-available { background: #c8e8d4; color: #1a4d2b; box-shadow: -3px 0 0 0 #c8e8d4; }
-.cal2-cell.is-range-end.is-range-few      { background: #f7dcb0; color: #7a4500; box-shadow: -3px 0 0 0 #f7dcb0; }
-.cal2-cell.is-range-end.is-range-full     { background: #d8d8d8; color: #4a4a4a; box-shadow: -3px 0 0 0 #d8d8d8; }
+/* End day: same dark bg + white as start cell, rounded right, strip bridge left */
+.cal2-cell.is-range-end { border-radius: 0 8px 8px 0; color: var(--white); font-weight: 700; }
+.cal2-cell.is-range-end.is-range-available { background: var(--success); box-shadow: -3px 0 0 0 #c8e8d4; }
+.cal2-cell.is-range-end.is-range-few      { background: var(--warn);    box-shadow: -3px 0 0 0 #f7dcb0; }
+.cal2-cell.is-range-end.is-range-full     { background: var(--muted);   box-shadow: -3px 0 0 0 #d8d8d8; }
 .cal2-cell.is-range.is-past { opacity: .5; }
 
 /* ── Trip range icons ────────────────────────────────── */

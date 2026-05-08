@@ -482,10 +482,10 @@ function MiniMonth({
                   title={isEnd ? `${titles} – érkezés` : titles}
                   aria-label={`${d}.${isEnd ? ' (érkezés)' : ''}`}
                 >
+                  <span className="cal2-cell-num">{d}</span>
                   {isEnd && (
                     <Plane size={13} aria-hidden="true" className="cal2-range-icon" />
                   )}
-                  <span className="cal2-cell-num">{d}</span>
                 </span>
               );
             }
