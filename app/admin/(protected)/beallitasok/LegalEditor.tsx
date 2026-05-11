@@ -4,6 +4,7 @@ import { useState, useTransition, useActionState } from 'react';
 import { Save, Loader2 } from 'lucide-react';
 import { saveLegalPage, type SaveState } from '../oldalak/actions';
 import type { LegalPageContent, SiteContentMap } from '@/lib/site-content';
+import { RichTextEditor } from '@/components/RichTextEditor';
 
 const initial: SaveState = { ok: false };
 
@@ -60,21 +61,9 @@ export function LegalEditor({
       </div>
 
       <div className="admin-field admin-field-wide">
-        <label htmlFor={`${contentKey}-html`}>
-          Tartalom (HTML)
-          <span className="admin-field-hint" style={{ display: 'block', marginTop: 2 }}>
-            Alapvető HTML tagek használhatók: &lt;h2&gt;–&lt;h4&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;a&gt;, &lt;table&gt;, &lt;dl&gt;, &lt;dt&gt;, &lt;dd&gt;. A [KITÖLTENDŐ] jelölések helyére írd be az adataidat.
-          </span>
-        </label>
-        <textarea
-          id={`${contentKey}-html`}
-          name="html"
-          rows={24}
-          value={html}
-          onChange={(e) => setHtml(e.target.value)}
-          required
-          style={{ fontFamily: 'monospace', fontSize: '0.82rem' }}
-        />
+        <label>Tartalom</label>
+        <RichTextEditor value={html} onChange={setHtml} />
+        <input type="hidden" name="html" value={html} />
       </div>
 
       <div className="admin-form-bar admin-field-wide">
