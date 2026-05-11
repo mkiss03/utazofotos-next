@@ -9,7 +9,7 @@ import { HeroEditor } from '@/app/admin/(protected)/oldalak/HeroEditor';
 import { TestimonialsEditor } from '@/app/admin/(protected)/oldalak/TestimonialsEditor';
 import { TestimonialsGallery } from '@/components/TestimonialsGallery';
 import { getAllDestinations } from '@/lib/data/destinations';
-import { sortByNextDeparture, getNextAnyDeparture } from '@/lib/destinations';
+import { getNextAnyDeparture } from '@/lib/destinations';
 import { getSiteContentMany } from '@/lib/site-content';
 import { isAdminViewer } from '@/lib/admin-viewer';
 
@@ -25,7 +25,7 @@ export default async function HomePage() {
     isAdminViewer(),
   ]);
   const { hero, testimonials } = content;
-  const upcoming = sortByNextDeparture(all).slice(0, 6);
+  const upcoming = all.slice(0, 6);
   const today = new Date(new Date().setHours(0, 0, 0, 0));
 
   const gridItems: GridDestination[] = upcoming.map((d) => {

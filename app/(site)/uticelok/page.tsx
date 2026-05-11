@@ -3,7 +3,6 @@ import { FBanner, Footer } from '@/components/Footer';
 import { DestinationCard } from '@/components/DestinationCard';
 import { AdminEditFab } from '@/components/AdminEditFab';
 import { getAllDestinations } from '@/lib/data/destinations';
-import { sortByNextDeparture } from '@/lib/destinations';
 
 export const revalidate = 60;
 export const dynamic = 'force-dynamic';
@@ -15,8 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UticelokPage() {
-  const all = await getAllDestinations();
-  const sorted = sortByNextDeparture(all);
+  const sorted = await getAllDestinations();
 
   return (
     <>
