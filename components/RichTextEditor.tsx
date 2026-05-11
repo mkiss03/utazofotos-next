@@ -42,7 +42,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   // Sync external value changes (e.g. page switch)
   useEffect(() => {
     if (editor && editor.getHTML() !== value) {
-      editor.commands.setContent(value, false);
+      editor.commands.setContent(value);
     }
   }, [value, editor]);
 
