@@ -21,6 +21,8 @@
   --trans: 0.25s ease;
   --max: 1100px;
   --radius: 4px;
+  --ink: #1a1a1a;
+  --container-pad: 24px;
 }
 html { scroll-behavior: smooth; }
 /* SENIOR-FRIENDLY: nagyobb alap betűméret (16 → 17px), bővített line-height. */
@@ -240,10 +242,14 @@ textarea.form-ctrl { resize: vertical; min-height: 120px; line-height: 1.55; }
 
 /* RESPONSIVE */
 @media (max-width: 720px) {
-  :root { --nav-h: 76px; }
+  :root { --nav-h: 76px; --container-pad: 16px; }
   .nav-logo-img { height: 60px !important; width: 60px !important; }
   .nav-links { display: none; }
   .hamburger { display: flex; margin-left: auto; }
+  /* Hero title: allow wrapping on mobile, scale down font */
+  .hero-title { white-space: normal; font-size: clamp(1.5rem, 6.5vw, 2.6rem); }
+  .topbar-inner { padding: 0 16px; }
+  /* Timeline */
   .tl-item { grid-template-columns: 56px 1fr; grid-template-rows: auto; }
   .tl-left, .tl-right { padding-top: 10px; padding-left: 14px; padding-right: 0; text-align: left; align-items: flex-start; }
   .tl-h { display: none; }
@@ -251,12 +257,26 @@ textarea.form-ctrl { resize: vertical; min-height: 120px; line-height: 1.55; }
   .tl-left { grid-column: 2; grid-row: 1; }
   .tl-right { grid-column: 2; grid-row: 1; }
   .tl-center { grid-column: 1; grid-row: 1; align-items: flex-start; }
-  .about-wrap { grid-template-columns: 1fr; }
+  /* About */
+  .about-wrap { grid-template-columns: 1fr; padding-left: 16px; padding-right: 16px; }
   .about-sticky { position: static; }
   .about-photo-wrap { aspect-ratio: 4 / 3; }
-  .contact-wrap { grid-template-columns: 1fr; }
+  /* Contact */
+  .contact-wrap { grid-template-columns: 1fr; padding-left: 16px; padding-right: 16px; }
+  /* Forms */
+  .form-wrap { padding-left: 16px; padding-right: 16px; }
   .form-steps { grid-template-columns: 1fr 1fr; }
   .form-row { grid-template-columns: 1fr; }
+  /* Schedule */
+  .sched-wrap { padding-left: 16px; padding-right: 16px; }
+  /* Trip detail (old style) */
+  .td-wrap { padding-left: 16px; padding-right: 16px; }
+  /* Legal pages */
+  .legal-page { padding-left: 16px; padding-right: 16px; }
+  /* Page hero section */
+  .ph { padding: 40px 16px; }
+  /* Section headings */
+  .section-head { padding: 44px 16px 28px; }
 }
 
 /* ============================================== */
