@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import Script from 'next/script';
 import { Footer } from '@/components/Footer';
 import { BookingFormWrapper } from './BookingFormWrapper';
 import { getAllDestinations } from '@/lib/data/destinations';
@@ -51,6 +52,13 @@ export default async function JelentkezesPage() {
         </Suspense>
       </div>
       <Footer withSocial={false} />
+      <Script id="zscrm-config" strategy="afterInteractive">{`
+        window.ZsuzsiCRMConfig = {
+          apiUrl: 'https://zscrm.utazofotos.com/api/booking-form',
+          phoneNumber: '+36 30 247 3323',
+        };
+      `}</Script>
+      <Script src="https://zscrm.utazofotos.com/booking-form.js" strategy="afterInteractive" />
     </>
   );
 }
